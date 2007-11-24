@@ -20,8 +20,6 @@ package org.apache.maven.scm.provider.git.gitexe.command;
  */
 
 import org.apache.maven.scm.log.ScmLogger;
-import org.apache.maven.scm.provider.git.util.GitUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -50,25 +48,13 @@ public class GitCommandLineUtils
             return;
         }
 
-        StringBuffer sb = new StringBuffer();
-        String ls = System.getProperty( "line.separator" );
         for ( Iterator i = files.iterator(); i.hasNext(); )
         {
             File f = (File) i.next();
-            sb.append( f.getPath().replace( '\\', '/' ) );
-            sb.append( ls );
+            // no setFile() since this screws up the working directory!
+            cl.createArgument().setValue( f.getName() );
         }
 
-        File targets = File.createTempFile( "maven-scm-", "-targets" );
-        PrintStream out = new PrintStream( new FileOutputStream( targets ) );
-        out.print( sb.toString() );
-        out.flush();
-        out.close();
-
-        cl.createArgument().setValue( "--targets" );
-        cl.createArgument().setValue( targets.getAbsolutePath() );
-
-        targets.deleteOnExit();
     }
 
     public static Commandline getBaseGitCommandLine( File workingDirectory, String command )
@@ -93,8 +79,6 @@ public class GitCommandLineUtils
     {
         int exitCode = CommandLineUtils.executeCommandLine( cl, consumer, stderr );
 
-        exitCode = checkIfCleanUpIsNeeded( exitCode, cl, consumer, stderr, logger );
-
         return exitCode;
     }
 
@@ -104,51 +88,7 @@ public class GitCommandLineUtils
     {
         int exitCode = CommandLineUtils.executeCommandLine( cl, stdout, stderr );
 
-        exitCode = checkIfCleanUpIsNeeded( exitCode, cl, stdout, stderr, logger );
-
         return exitCode;
-    }
-
-    private static int checkIfCleanUpIsNeeded( int exitCode, Commandline cl, StreamConsumer consumer,
-                                               CommandLineUtils.StringStreamConsumer stderr, ScmLogger logger )
-        throws CommandLineException
-    {
-        if ( exitCode != 0 && stderr.getOutput() != null && stderr.getOutput().indexOf( "'git cleanup'" ) > 0 &&
-            stderr.getOutput().indexOf( "'git help cleanup'" ) > 0 )
-        {
-            logger.info( "Git command failed due to some locks in working copy. We try to run a 'git cleanup'." );
-
-            if ( executeCleanUp( cl.getWorkingDirectory(), consumer, stderr, logger ) == 0 )
-            {
-                exitCode = CommandLineUtils.executeCommandLine( cl, consumer, stderr );
-            }
-        }
-        return exitCode;
-    }
-
-    public static int executeCleanUp( File workinDirectory, StreamConsumer stdout, StreamConsumer stderr )
-        throws CommandLineException
-    {
-        return executeCleanUp( workinDirectory, stdout, stderr, null );
-    }
-
-    public static int executeCleanUp( File workinDirectory, StreamConsumer stdout, StreamConsumer stderr,
-                                      ScmLogger logger )
-        throws CommandLineException
-    {
-        Commandline cl = new Commandline();
-
-        cl.setExecutable( "git" );
-
-        cl.setWorkingDirectory( workinDirectory.getAbsolutePath() );
-
-        if ( logger != null )
-        {
-            logger.info( "Executing: " + cl );
-            logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
-        }
-
-        return CommandLineUtils.executeCommandLine( cl, stdout, stderr );
     }
 
 

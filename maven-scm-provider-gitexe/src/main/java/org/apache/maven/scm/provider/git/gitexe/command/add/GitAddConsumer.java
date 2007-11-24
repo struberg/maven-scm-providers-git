@@ -67,7 +67,7 @@ public class GitAddConsumer
         if ( line.startsWith( "add '" ) )
         {
             status = ScmFileStatus.ADDED;
-            file = line.substring( 4, file.length()-1 );
+            file = line.substring( 5, line.length()-1 );
         }
         else
         {

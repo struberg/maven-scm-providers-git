@@ -40,7 +40,6 @@ public class GitCheckOutCommandTckTest
     public void initRepo()
         throws Exception
     {
-        //X GitScmTestUtils.initRepo( "src/test/tck-repository/", getRepositoryRoot(), getWorkingDirectory() );
-        GitScmTestUtils.initRepo( "src/test/tck-repository/", getWorkingDirectory(), new File("target/notexisting") );
+        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
 }

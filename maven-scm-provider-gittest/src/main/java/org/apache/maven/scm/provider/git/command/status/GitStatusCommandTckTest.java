@@ -41,6 +41,6 @@ public class GitStatusCommandTckTest
     public void initRepo()
         throws Exception
     {
-        GitScmTestUtils.initRepo( "src/test/resources/repository/", getWorkingDirectory(), new File("target/notexisting") );
+        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
 }

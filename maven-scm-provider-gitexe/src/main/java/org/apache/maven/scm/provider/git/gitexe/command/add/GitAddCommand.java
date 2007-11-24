@@ -85,12 +85,13 @@ public class GitAddCommand
     {
         // Base command line doesn't make sense here - username/password not needed, and non-interactive is not valid
 
-        Commandline cl = new Commandline();
-
-        cl.setExecutable( "git-add" );
+        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "add" );
 
         cl.setWorkingDirectory( workingDirectory.getAbsolutePath() );
 
+        // verbosity needed for consumer
+        cl.createArgument().setValue( "-v" );
+        
         try
         {
             GitCommandLineUtils.addTarget( cl, files );
