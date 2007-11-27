@@ -23,7 +23,6 @@ import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.util.GitUtil;
 import org.apache.maven.scm.providers.gitlib.settings.Settings;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
 /**

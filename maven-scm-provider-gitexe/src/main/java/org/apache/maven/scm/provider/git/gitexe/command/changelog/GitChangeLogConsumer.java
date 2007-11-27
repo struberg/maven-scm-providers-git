@@ -89,17 +89,6 @@ public class GitChangeLogConsumer
     private static final String FILE_PATTERN = "^:\\d* \\d* [:xdigit:]*\\.* [:xdigit:]*\\.* ([:upper:])\\t(.*)";
     
     /**
-     * all files processed if we are in status {@link #STATUS_GET_FILE} and we detect this string.  
-     */
-    private static final String FILE_END_TOKEN = "\n";
-    
-    /**
-     * A comment always start with 4 blanks (0x20)
-     * All comments processed if we are in status {@link #STATUS_GET_COMMENT} and we detect this string.
-     */
-    private static final String COMMENT_END_TOKEN = "\n";
-    
-    /**
      * Current status of the parser
      */
     private int status = STATUS_GET_HEADER;
@@ -311,6 +300,9 @@ public class GitChangeLogConsumer
         if ( line.length() == 0)
         {
             entries.add( currentChange );
+            
+            resetChangeLog();
+            
             status = STATUS_GET_HEADER;
         }
         else
@@ -319,7 +311,7 @@ public class GitChangeLogConsumer
             {
                 return;
             }
-            String action = fileRegexp.getParen( 1 );
+            // String action = fileRegexp.getParen( 1 );
             // action is currently not used
             
             String name = fileRegexp.getParen( 2 );
@@ -328,4 +320,8 @@ public class GitChangeLogConsumer
         }
     }
 
+    private void resetChangeLog() {
+    	currentComment = null;
+    	currentChange = null;
+    }
 }

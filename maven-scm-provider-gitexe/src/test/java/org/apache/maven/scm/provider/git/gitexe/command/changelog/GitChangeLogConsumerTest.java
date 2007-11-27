@@ -22,6 +22,7 @@ package org.apache.maven.scm.provider.git.gitexe.command.changelog;
 import org.apache.maven.scm.ChangeFile;
 import org.apache.maven.scm.ChangeSet;
 import org.apache.maven.scm.log.DefaultLog;
+import org.apache.regexp.RESyntaxException;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.BufferedReader;
@@ -33,14 +34,13 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitChangeLogConsumerTest.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitChangeLogConsumerTest
     extends PlexusTestCase
 {
     
-    public void testConsumer()
+    public void testConsumer1()
     throws Exception
     {
         GitChangeLogConsumer consumer = new GitChangeLogConsumer( new DefaultLog(), null );
@@ -94,5 +94,64 @@ public class GitChangeLogConsumerTest
         assertEquals( "src/test/java/Test.java", cf.getName()  );
         assertTrue( cf.getRevision() != null && cf.getRevision().length() > 0 );
     }
-    
+ 
+    public void testConsumer2()
+    throws Exception
+    {
+        GitChangeLogConsumer consumer = new GitChangeLogConsumer( new DefaultLog(), null );
+
+        File f = getTestFile( "/src/test/resources/git/changelog/gitwhatchanged2.log" );
+
+        BufferedReader r = new BufferedReader( new FileReader( f ) );
+
+        String line;
+
+        while ( ( line = r.readLine() ) != null )
+        {
+            consumer.consumeLine( line );
+        }
+        
+        // this has to be performed to ensure that alle files could have been written back to 
+        // the ChangeSet if no final LF has been provided in the file
+        consumer.consumeLine( "" );
+        
+        List modifications = consumer.getModifications();
+        
+        for ( Iterator i = modifications.iterator(); i.hasNext(); )
+        {
+            ChangeSet entry = (ChangeSet) i.next();
+            
+            assertEquals( "Mark Struberg <struberg@yahoo.de>", entry.getAuthor() );
+
+            assertNotNull( entry.getDate() );
+            System.out.println( "Date:" + entry.getDate() );
+            
+            assertTrue( entry.getComment() != null && entry.getComment().length() > 0 );
+            System.out.println( "Comment:" + entry.getComment() );
+            
+            assertNotNull( entry.getFiles() );
+            System.out.println( "Files:" + entry.getFiles() + "\n");
+            assertFalse( entry.getFiles().isEmpty() );
+        }    
+        
+        assertEquals( 8, modifications.size() );
+
+        ChangeSet entry = (ChangeSet) modifications.get( 3 );
+        
+        assertEquals( "Mark Struberg <struberg@yahoo.de>", entry.getAuthor() );
+
+        assertNotNull( entry.getDate() );
+        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
+        sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+        
+        assertEquals( "2007-11-24 00:10:42 +0000", sdf.format( entry.getDate() ) );
+        
+        assertEquals( "tck\n" , entry.getComment() );
+        
+        assertNotNull( entry.getFiles() );
+        ChangeFile cf = (ChangeFile) entry.getFiles().get( 0 );
+        assertEquals( "src/test/java/Test.java", cf.getName()  );
+        assertTrue( cf.getRevision() != null && cf.getRevision().length() > 0 );
+    }
+ 
 }
