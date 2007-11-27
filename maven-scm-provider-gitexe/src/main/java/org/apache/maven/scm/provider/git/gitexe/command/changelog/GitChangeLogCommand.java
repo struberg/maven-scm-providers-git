@@ -105,9 +105,6 @@ public class GitChangeLogCommand
         
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "whatchanged" );
 
-        // TODO: May want to add some kind of support for --stop-on-copy and --limit NUM
-
-        
         if ( startVersion != null ) {
             cl.createArgument().setValue( "--since=" + StringUtils.escape( startVersion.getName() ) );
         }

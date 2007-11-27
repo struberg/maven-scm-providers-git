@@ -31,72 +31,78 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitChangeLogConsumer.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitChangeLogConsumer
     extends AbstractConsumer
 {
     /**
-     * Date formatter for git timestamp (after a little massaging)
+     * Date formatter for git timestamp
      */
-    private static final String GIT_TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss zzzzzzzzz";
+    private static final String GIT_TIMESTAMP_PATTERN = "MMM dd HH:mm:ss yyyy Z";
 
     /**
      * State machine constant: expecting header
      */
-    private static final int GET_HEADER = 1;
+    private static final int STATUS_GET_HEADER = 1;
 
+    /**
+     * State machine constant: expecting author information
+     */
+    private static final int STATUS_GET_AUTHOR = 2;
+    
+    /**
+     * State machine constant: expecting date information
+     */
+    private static final int STATUS_GET_DATE = 3;
+    
     /**
      * State machine constant: expecting file information
      */
-    private static final int GET_FILE = 2;
+    private static final int STATUS_GET_FILE = 4;
 
     /**
      * State machine constant: expecting comments
      */
-    private static final int GET_COMMENT = 3;
+    private static final int STATUS_GET_COMMENT = 5;
 
-    /**
-     * A file line begins with a space character
-     */
-    private static final String FILE_BEGIN_TOKEN = " ";
-
-    /**
-     * The file section ends with a blank line
-     */
-    private static final String FILE_END_TOKEN = "";
-
-    /**
-     * The filename starts after 5 characters
-     */
-    private static final int FILE_START_INDEX = 5;
-
-    /**
-     * The comment section ends with a dashed line
-     */
-    private static final String COMMENT_END_TOKEN =
-        "------------------------------------" + "------------------------------------";
-
+    
     /**
      * The pattern used to match git header lines
      */
-    private static final String pattern = "^rev (\\d+):\\s+" + // revision number
-        "(\\w+)\\s+\\|\\s+" + // author username
-        "(\\d+-\\d+-\\d+ " + // date 2002-08-24
-        "\\d+:\\d+:\\d+) " + // time 16:01:00
-        "([\\-+])(\\d\\d)(\\d\\d)"; // gmt offset -0400
+    private static final String HEADER_PATTERN = "^commit (.*)";
 
-    private static final String pattern2 = "^r(\\d+)\\s+\\|\\s+" +          // revision number
-        "(\\(\\S+\\s+\\S+\\)|\\S+)\\s+\\|\\s+" + // author username
-        "(\\d+-\\d+-\\d+ " +             // date 2002-08-24
-        "\\d+:\\d+:\\d+) " +             // time 16:01:00
-        "([\\-+])(\\d\\d)(\\d\\d)";      // gmt offset -0400
+    /**
+     * The pattern used to match git author lines
+     */
+    private static final String AUTHOR_PATTERN = "^Author: (.*)";
 
+    /**
+     * The pattern used to match git date lines
+     */
+    private static final String DATE_PATTERN = "^Date:\\s*\\w\\w\\w\\s(.*)";
+
+    /**
+     * The pattern used to match git file lines
+     */
+//X    private static final String FILE_PATTERN = "^:\\d* \\d* [:xdigit:]*\\.* [:xdigit:]*\\.* ([:upper:]) (.*)";
+    private static final String FILE_PATTERN = "^:\\d* \\d* [:xdigit:]*\\.* [:xdigit:]*\\.* ([:upper:])\\t(.*)";
+    
+    /**
+     * all files processed if we are in status {@link #STATUS_GET_FILE} and we detect this string.  
+     */
+    private static final String FILE_END_TOKEN = "\n";
+    
+    /**
+     * A comment always start with 4 blanks (0x20)
+     * All comments processed if we are in status {@link #STATUS_GET_COMMENT} and we detect this string.
+     */
+    private static final String COMMENT_END_TOKEN = "\n";
+    
     /**
      * Current status of the parser
      */
-    private int status = GET_HEADER;
+    private int status = STATUS_GET_HEADER;
 
     /**
      * List of change log entries
@@ -123,8 +129,22 @@ public class GitChangeLogConsumer
      */
     private RE headerRegexp;
 
-    private RE headerRegexp2;
-
+    /**
+     * The regular expression used to match author lines
+     */
+    private RE authorRegexp;
+    
+    /**
+     * The regular expression used to match date lines
+     */
+    private RE dateRegexp;
+    
+    /**
+     * The regular expression used to match file lines
+     */
+    private RE fileRegexp;
+    
+    
     private String userDateFormat;
 
     /**
@@ -138,8 +158,10 @@ public class GitChangeLogConsumer
 
         try
         {
-            headerRegexp = new RE( pattern );
-            headerRegexp2 = new RE( pattern2 );
+            headerRegexp = new RE( HEADER_PATTERN );
+            authorRegexp = new RE( AUTHOR_PATTERN );
+            dateRegexp   = new RE( DATE_PATTERN   );
+            fileRegexp   = new RE( FILE_PATTERN   );
         }
         catch ( RESyntaxException ex )
         {
@@ -162,14 +184,20 @@ public class GitChangeLogConsumer
     {
         switch ( status )
         {
-            case GET_HEADER:
+            case STATUS_GET_HEADER:
                 processGetHeader( line );
                 break;
-            case GET_FILE:
-                processGetFile( line );
+            case STATUS_GET_AUTHOR:
+                processGetAuthor( line );
                 break;
-            case GET_COMMENT:
+            case STATUS_GET_DATE:
+                processGetDate( line );
+                break;
+            case STATUS_GET_COMMENT:
                 processGetComment( line );
+                break;
+            case STATUS_GET_FILE:
+                processGetFile( line );
                 break;
             default:
                 throw new IllegalStateException( "Unknown state: " + status );
@@ -193,25 +221,81 @@ public class GitChangeLogConsumer
     {
         if ( !headerRegexp.match( line ) )
         {
-            if ( !headerRegexp2.match( line ) )
-            {
-                return;
-            }
-            else
-            {
-                headerRegexp = headerRegexp2;
-            }
+            return;
         }
 
         currentRevision = headerRegexp.getParen( 1 );
 
         currentChange = new GitChangeSet();
+        
+        status = STATUS_GET_AUTHOR;
+    }
 
-        currentChange.setAuthor( headerRegexp.getParen( 2 ) );
+    /**
+     * Process the current input line in the STATUS_GET_AUTHOR state.  This
+     * state gathers all of the author information that are part of a log entry.
+     *
+     * @param line a line of text from the git log output
+     */
+    private void processGetAuthor( String line )
+    {
+        if ( !authorRegexp.match( line ) )
+        {
+            return;
+        }
+        String author = authorRegexp.getParen( 1 );
+        
+        currentChange.setAuthor( author );
+        
+        status = STATUS_GET_DATE;
+    }
 
-        currentChange.setDate( parseDate() );
+    /**
+     * Process the current input line in the STATUS_GET_DATE state.  This
+     * state gathers all of the date information that are part of a log entry.
+     *
+     * @param line a line of text from the git log output
+     */
+    private void processGetDate( String line )
+    {
+        if ( !dateRegexp.match( line ) )
+        {
+            return;
+        }
+        
+        String datestring = dateRegexp.getParen( 1 );
+        
+        Date date = parseDate( datestring.trim() , userDateFormat, GIT_TIMESTAMP_PATTERN );
+        
+        currentChange.setDate( date );
+        
+        status = STATUS_GET_COMMENT;
+    }
 
-        status = GET_FILE;
+    /**
+     * Process the current input line in the GET_COMMENT state.  This
+     * state gathers all of the comments that are part of a log entry.
+     *
+     * @param line a line of text from the git log output
+     */
+    private void processGetComment( String line )
+    {
+        if ( line.length() < 4 )
+        {
+            if (currentComment == null)
+            {
+                currentComment = new StringBuffer();
+            }
+            else
+            {
+                currentChange.setComment( currentComment.toString() );
+                status = STATUS_GET_FILE;
+            }
+        }
+        else 
+        {
+            currentComment.append( line.substring( 4 ) ).append( '\n' );
+        }
     }
 
     /**
@@ -224,58 +308,24 @@ public class GitChangeLogConsumer
      */
     private void processGetFile( String line )
     {
-        if ( line.startsWith( FILE_BEGIN_TOKEN ) )
+        if ( line.length() == 0)
         {
-            // Skip the status flags and just get the name of the file
-            String name = line.substring( FILE_START_INDEX );
-            currentChange.addFile( new ChangeFile( name, currentRevision ) );
-
-            status = GET_FILE;
-        }
-        else if ( line.equals( FILE_END_TOKEN ) )
-        {
-            // Create a buffer for the collection of the comment now
-            // that we are leaving the GET_FILE state.
-            currentComment = new StringBuffer();
-
-            status = GET_COMMENT;
-        }
-    }
-
-    /**
-     * Process the current input line in the GET_COMMENT state.  This
-     * state gathers all of the comments that are part of a log entry.
-     *
-     * @param line a line of text from the git log output
-     */
-    private void processGetComment( String line )
-    {
-        if ( line.equals( COMMENT_END_TOKEN ) )
-        {
-            currentChange.setComment( currentComment.toString() );
-
             entries.add( currentChange );
-
-            status = GET_HEADER;
+            status = STATUS_GET_HEADER;
         }
         else
         {
-            currentComment.append( line ).append( '\n' );
+            if ( !fileRegexp.match( line ) )
+            {
+                return;
+            }
+            String action = fileRegexp.getParen( 1 );
+            // action is currently not used
+            
+            String name = fileRegexp.getParen( 2 );
+            
+            currentChange.addFile( new ChangeFile( name, currentRevision ) );
         }
     }
 
-    /**
-     * Converts the date timestamp from the git output into a date
-     * object.
-     *
-     * @return A date representing the timestamp of the log entry.
-     */
-    private Date parseDate()
-    {
-        StringBuffer date = new StringBuffer().append( headerRegexp.getParen( 3 ) ).append( " GMT" )
-            .append( headerRegexp.getParen( 4 ) ).append( headerRegexp.getParen( 5 ) ).append( ':' )
-            .append( headerRegexp.getParen( 6 ) );
-
-        return parseDate( date.toString(), userDateFormat, GIT_TIMESTAMP_PATTERN );
-    }
 }
