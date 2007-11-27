@@ -42,17 +42,17 @@ public class GitChangeLogCommandTest
         throws Exception
     {
         testCommandLine( "scm:git:http://foo.com/git", null, null, null,
-                         "git-log" );
+                         "git-whatchanged" );
     }
 
     public void testCommandLineWithDates()
         throws Exception
     {
-        Date startDate = getDate( 2003, Calendar.SEPTEMBER, 10, null );
-        Date endDate = getDate( 2007, Calendar.OCTOBER, 10, null );
+        Date startDate = getDate( 2003, Calendar.SEPTEMBER, 10,  GMT_TIME_ZONE );
+        Date endDate = getDate( 2007, Calendar.OCTOBER, 10, GMT_TIME_ZONE );
 
         testCommandLine( "scm:git:http://foo.com/git", null, startDate, endDate,
-                         "git-log \"--since=2003-09-10 00:00\" \"--until=2007-10-10 00:00\"" );
+                         "git-whatchanged \"--since=2003-09-10 00:00:00 +0000\" \"--until=2007-10-10 00:00:00 +0000\"" );
     }
 
     public void testCommandLineStartDateOnly()
@@ -61,7 +61,7 @@ public class GitChangeLogCommandTest
         Date startDate = getDate( 2003, Calendar.SEPTEMBER, 10, 1, 1, 1, GMT_TIME_ZONE );
 
         testCommandLine( "scm:git:http://foo.com/git", null, startDate, null,
-                         "git --non-interactive log -v -r \"{2003-09-10 01:01:01 +0000}:HEAD\" http://foo.com/git" );
+                         "git-whatchanged \"--since=2003-09-10 01:01:01 +0000\"" );
     }
 
     public void testCommandLineDateFormat()
@@ -71,7 +71,7 @@ public class GitChangeLogCommandTest
         Date endDate = getDate( 2005, Calendar.NOVEMBER, 13, 23, 23, 23, GMT_TIME_ZONE );
 
         testCommandLine( "scm:git:http://foo.com/git", null, startDate, endDate,
-                         "git --non-interactive log -v -r \"{2003-09-10 01:01:01 +0000}:{2005-11-13 23:23:23 +0000}\" http://foo.com/git" );
+                         "git-whatchanged \"--since=2003-09-10 01:01:01 +0000\" \"--until=2005-11-13 23:23:23 +0000\"" );
     }
 
     public void testCommandLineEndDateOnly()
@@ -81,64 +81,36 @@ public class GitChangeLogCommandTest
 
         // Only specifying end date should print no dates at all
         testCommandLine( "scm:git:http://foo.com/git", null, null, endDate,
-                         "git --non-interactive log -v http://foo.com/git" );
+                         "git-whatchanged \"--until=2003-11-10 00:00:00 +0000\"" );
     }
 
     public void testCommandLineWithBranchNoDates()
         throws Exception
     {
         testCommandLine( "scm:git:http://foo.com/git", new ScmBranch( "my-test-branch" ), null, null,
-                         "git --non-interactive log -v http://foo.com/git/branches/my-test-branch http://foo.com/git" );
+                         "git-whatchanged" );
     }
 
-    public void testCommandLineWithBranchStartDateOnly()
-        throws Exception
-    {
-        Date startDate = getDate( 2003, Calendar.SEPTEMBER, 10, 1, 1, 1, GMT_TIME_ZONE );
-
-        testCommandLine( "scm:git:http://foo.com/git", new ScmBranch( "my-test-branch" ), startDate, null,
-                         "git --non-interactive log -v -r \"{2003-09-10 01:01:01 +0000}:HEAD\" http://foo.com/git/branches/my-test-branch http://foo.com/git" );
-    }
-
-    public void testCommandLineWithBranchEndDateOnly()
-        throws Exception
-    {
-        Date endDate = getDate( 2003, Calendar.OCTOBER, 10, 1, 1, 1, GMT_TIME_ZONE );
-
-        // Only specifying end date should print no dates at all
-        testCommandLine( "scm:git:http://foo.com/git", new ScmBranch( "my-test-branch" ), null, endDate,
-                         "git --non-interactive log -v http://foo.com/git/branches/my-test-branch http://foo.com/git" );
-    }
-
-    public void testCommandLineWithBranchBothDates()
-        throws Exception
-    {
-        Date startDate = getDate( 2003, Calendar.SEPTEMBER, 10, GMT_TIME_ZONE );
-        Date endDate = getDate( 2003, Calendar.OCTOBER, 10, GMT_TIME_ZONE );
-
-        testCommandLine( "scm:git:http://foo.com/git", new ScmBranch( "my-test-branch" ), startDate, endDate,
-                         "git --non-interactive log -v -r \"{2003-09-10 00:00:00 +0000}:{2003-10-10 00:00:00 +0000}\" http://foo.com/git/branches/my-test-branch http://foo.com/git" );
-    }
 
     public void testCommandLineWithStartVersion()
         throws Exception
     {
         testCommandLine( "scm:git:http://foo.com/git", new ScmRevision("1"), null,
-                         "git --non-interactive log -v -r 1:HEAD http://foo.com/git" );
+                         "git-whatchanged --since=1" );
     }
 
     public void testCommandLineWithStartVersionAndEndVersion()
         throws Exception
     {
         testCommandLine( "scm:git:http://foo.com/git", new ScmRevision("1"), new ScmRevision("10"),
-                         "git --non-interactive log -v -r 1:10 http://foo.com/git" );
+                         "git-whatchanged --since=1 --until=10" );
     }
 
     public void testCommandLineWithStartVersionAndEndVersionEquals()
         throws Exception
     {
         testCommandLine( "scm:git:http://foo.com/git", new ScmRevision("1"), new ScmRevision("1"),
-                         "git --non-interactive log -v -r 1 http://foo.com/git" );
+                         "git-whatchanged --since=1 --until=1" );
     }
 
     // ----------------------------------------------------------------------
