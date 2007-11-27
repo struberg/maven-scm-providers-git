@@ -30,7 +30,7 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
@@ -100,35 +100,36 @@ public class GitChangeLogCommand
                                                  ScmBranch branch, Date startDate, Date endDate,
                                                  ScmVersion startVersion, ScmVersion endVersion )
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
-
-        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "log" );
+        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+        dateFormat.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+        
+        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "whatchanged" );
 
         // TODO: May want to add some kind of support for --stop-on-copy and --limit NUM
 
-        if ( startDate != null )
-        {
-            cl.createArgument().setValue( "--since=" + dateFormat.format( startDate ) );
+        
+        if ( startVersion != null ) {
+            cl.createArgument().setValue( "--since=" + StringUtils.escape( startVersion.getName() ) );
         }
-
-        if ( endDate != null )
+        else 
         {
-            cl.createArgument().setValue( "--until=" + dateFormat.format( endDate ) );
-        }
-
-        if ( startVersion != null || endVersion != null )
-        {
-            if ( startVersion != null )
+            if ( startDate != null )
             {
-                cl.createArgument().setValue( startVersion.getName() );
-
-                if ( endVersion != null )
-                {
-                    cl.createArgument().setValue( endVersion.getName() );
-                }
+                cl.createArgument().setValue( "--since=" + StringUtils.escape( dateFormat.format( startDate ) ) );
             }
         }
-
+        
+        if ( endVersion != null ) {
+            cl.createArgument().setValue( "--until=" + StringUtils.escape( endVersion.getName() ) );
+        }
+        else
+        {
+            if ( endDate != null )
+            {
+                cl.createArgument().setValue( "--until=" + StringUtils.escape( dateFormat.format( endDate ) ) );
+            }
+        }
+        
         return cl;
     }
 }
