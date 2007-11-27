@@ -76,13 +76,10 @@ public class GitCheckOutCommand
             // git repo exists, so we must git-pull the changes
             Commandline clPull = createPullCommand( repository, fileSet.getBasedir(), version );
             
-            try
+            exitCode = GitCommandLineUtils.execute( clPull, stdout, stderr, getLogger() );
+            if ( exitCode != 0 )
             {
-                exitCode = GitCommandLineUtils.execute( clPull, stdout, stderr, getLogger() );
-            }
-            catch ( CommandLineException ex )
-            {
-                throw new ScmException( "Error while executing command.", ex );
+                return new CheckOutScmResult( clPull.toString(), "The git command failed.", stderr.getOutput(), false );
             }
         }
         else 
@@ -96,13 +93,10 @@ public class GitCheckOutCommand
             // no git repo seems to exist, let's clone the original repo
             Commandline clClone = createCloneCommand( repository, fileSet.getBasedir(), version );
             
-            try
+            exitCode = GitCommandLineUtils.execute( clClone, stdout, stderr, getLogger() );
+            if ( exitCode != 0 )
             {
-                exitCode = GitCommandLineUtils.execute( clClone, stdout, stderr, getLogger() );
-            }
-            catch ( CommandLineException ex )
-            {
-                throw new ScmException( "Error while executing command.", ex );
+                return new CheckOutScmResult( clClone.toString(), "The git command failed.", stderr.getOutput(), false );
             }
         }
         
@@ -111,18 +105,7 @@ public class GitCheckOutCommand
 
         GitCheckOutConsumer consumer = new GitCheckOutConsumer( getLogger(), fileSet.getBasedir().getParentFile() );
 
-        getLogger().info( "Executing: " + cl );
-        getLogger().info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
-
-        try
-        {
-            exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
-        }
-        catch ( CommandLineException ex )
-        {
-            throw new ScmException( "Error while executing command.", ex );
-        }
-
+        exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
         if ( exitCode != 0 )
         {
             return new CheckOutScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
@@ -131,15 +114,7 @@ public class GitCheckOutCommand
         // and now search for the files
         Commandline clList = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "ls-files" );
         
-        try
-        {
-            exitCode = GitCommandLineUtils.execute( clList, consumer, stderr, getLogger() );
-        }
-        catch ( CommandLineException ex )
-        {
-            throw new ScmException( "Error while executing command.", ex );
-        }
-
+        exitCode = GitCommandLineUtils.execute( clList, consumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
             return new CheckOutScmResult( clList.toString(), "The git command failed.", stderr.getOutput(), false );

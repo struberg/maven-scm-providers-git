@@ -78,20 +78,9 @@ public class GitChangeLogCommand
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
 
-        getLogger().info( "Executing: " + cl );
-        getLogger().info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
-
         int exitCode;
 
-        try
-        {
-            exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
-        }
-        catch ( CommandLineException ex )
-        {
-            throw new ScmException( "Error while executing git command.", ex );
-        }
-
+        exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
             return new ChangeLogScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );

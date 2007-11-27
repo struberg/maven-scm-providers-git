@@ -73,20 +73,9 @@ public class GitBranchCommand
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
 
-        getLogger().info( "Executing: " + cl );
-        getLogger().info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
-
         int exitCode;
 
-        try
-        {
-            exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
-        }
-        catch ( CommandLineException ex )
-        {
-            throw new ScmException( "Error while executing command.", ex );
-        }
-
+        exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
         if ( exitCode != 0 )
         {
             return new BranchScmResult( cl.toString(), "The git branch command failed.", stderr.getOutput(), false );

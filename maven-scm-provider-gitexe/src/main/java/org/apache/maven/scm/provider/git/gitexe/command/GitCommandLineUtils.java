@@ -19,6 +19,7 @@ package org.apache.maven.scm.provider.git.gitexe.command;
  * under the License.
  */
 
+import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.log.ScmLogger;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -26,9 +27,6 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,7 +39,6 @@ import java.util.List;
 public class GitCommandLineUtils
 {
     public static void addTarget( Commandline cl, List/*<File>*/ files )
-        throws IOException
     {
         if ( files == null || files.isEmpty() )
         {
@@ -75,18 +72,40 @@ public class GitCommandLineUtils
 
     public static int execute( Commandline cl, StreamConsumer consumer, CommandLineUtils.StringStreamConsumer stderr,
                                ScmLogger logger )
-        throws CommandLineException
+        throws ScmException
     {
-        int exitCode = CommandLineUtils.executeCommandLine( cl, consumer, stderr );
+        logger.info( "Executing: " + cl );
+        logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
+
+    	int exitCode;
+        try
+        {
+            exitCode = CommandLineUtils.executeCommandLine( cl, consumer, stderr );
+        }
+        catch ( CommandLineException ex )
+        {
+            throw new ScmException( "Error while executing command.", ex );
+        }
 
         return exitCode;
     }
 
     public static int execute( Commandline cl, CommandLineUtils.StringStreamConsumer stdout,
                                CommandLineUtils.StringStreamConsumer stderr, ScmLogger logger )
-        throws CommandLineException
+    throws ScmException
     {
-        int exitCode = CommandLineUtils.executeCommandLine( cl, stdout, stderr );
+        logger.info( "Executing: " + cl );
+        logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
+
+    	int exitCode;
+        try
+        {
+            exitCode = CommandLineUtils.executeCommandLine( cl, stdout, stderr );
+        }
+        catch ( CommandLineException ex )
+        {
+            throw new ScmException( "Error while executing command.", ex );
+        }
 
         return exitCode;
     }

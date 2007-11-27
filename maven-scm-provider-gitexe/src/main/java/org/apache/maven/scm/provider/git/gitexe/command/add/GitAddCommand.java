@@ -32,7 +32,6 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -58,20 +57,9 @@ public class GitAddCommand
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
 
-        getLogger().info( "Executing: " + cl );
-        getLogger().info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
-
         int exitCode;
 
-        try
-        {
-            exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
-        }
-        catch ( CommandLineException ex )
-        {
-            throw new ScmException( "Error while executing command.", ex );
-        }
-
+        exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
             return new AddScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
@@ -92,14 +80,7 @@ public class GitAddCommand
         // verbosity needed for consumer
         cl.createArgument().setValue( "-v" );
         
-        try
-        {
-            GitCommandLineUtils.addTarget( cl, files );
-        }
-        catch ( IOException e )
-        {
-            throw new ScmException( "Can't create the targets file", e );
-        }
+        GitCommandLineUtils.addTarget( cl, files );
 
         return cl;
     }
