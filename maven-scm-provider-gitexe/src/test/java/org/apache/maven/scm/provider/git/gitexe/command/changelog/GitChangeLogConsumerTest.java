@@ -22,7 +22,6 @@ package org.apache.maven.scm.provider.git.gitexe.command.changelog;
 import org.apache.maven.scm.ChangeFile;
 import org.apache.maven.scm.ChangeSet;
 import org.apache.maven.scm.log.DefaultLog;
-import org.apache.regexp.RESyntaxException;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.BufferedReader;
@@ -87,11 +86,11 @@ public class GitChangeLogConsumerTest
         
         assertEquals( "2007-11-24 00:10:42 +0000", sdf.format( entry.getDate() ) );
         
-        assertEquals( "tck\n" , entry.getComment() );
+        assertEquals( "/ added" , entry.getComment() );
         
         assertNotNull( entry.getFiles() );
         ChangeFile cf = (ChangeFile) entry.getFiles().get( 0 );
-        assertEquals( "src/test/java/Test.java", cf.getName()  );
+        assertEquals( "readme.txt", cf.getName()  );
         assertTrue( cf.getRevision() != null && cf.getRevision().length() > 0 );
     }
  
@@ -110,10 +109,6 @@ public class GitChangeLogConsumerTest
         {
             consumer.consumeLine( line );
         }
-        
-        // this has to be performed to ensure that alle files could have been written back to 
-        // the ChangeSet if no final LF has been provided in the file
-        consumer.consumeLine( "" );
         
         List modifications = consumer.getModifications();
         
@@ -136,7 +131,7 @@ public class GitChangeLogConsumerTest
         
         assertEquals( 8, modifications.size() );
 
-        ChangeSet entry = (ChangeSet) modifications.get( 3 );
+        ChangeSet entry = (ChangeSet) modifications.get( 4 );
         
         assertEquals( "Mark Struberg <struberg@yahoo.de>", entry.getAuthor() );
 
@@ -144,13 +139,16 @@ public class GitChangeLogConsumerTest
         SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
         sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
         
-        assertEquals( "2007-11-24 00:10:42 +0000", sdf.format( entry.getDate() ) );
-        
-        assertEquals( "tck\n" , entry.getComment() );
+        assertEquals( "2007-11-27 13:05:36 +0000", sdf.format( entry.getDate() ) );
+
+        assertEquals( "fixed a GitCommandLineUtil and provice first version of the checkin command." , entry.getComment() );
         
         assertNotNull( entry.getFiles() );
+        
+        assertEquals( 10, entry.getFiles().size() );
+        
         ChangeFile cf = (ChangeFile) entry.getFiles().get( 0 );
-        assertEquals( "src/test/java/Test.java", cf.getName()  );
+        assertEquals( "maven-scm-provider-gitexe/src/main/java/org/apache/maven/scm/provider/git/gitexe/command/GitCommandLineUtils.java", cf.getName()  );
         assertTrue( cf.getRevision() != null && cf.getRevision().length() > 0 );
     }
  

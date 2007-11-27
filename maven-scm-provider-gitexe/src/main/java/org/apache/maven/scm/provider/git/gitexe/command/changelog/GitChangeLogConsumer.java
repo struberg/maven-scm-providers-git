@@ -162,6 +162,9 @@ public class GitChangeLogConsumer
 
     public List getModifications()
     {
+        // this is needed since the processFile does not always get a the end-sequence correctly. 
+        processGetFile( "" );
+        
         return entries;
     }
 
@@ -283,7 +286,11 @@ public class GitChangeLogConsumer
         }
         else 
         {
-            currentComment.append( line.substring( 4 ) ).append( '\n' );
+            if ( currentComment.length() > 0 ) {
+                currentComment.append( '\n' );
+            }
+            
+            currentComment.append( line.substring( 4 ) );
         }
     }
 
@@ -297,9 +304,12 @@ public class GitChangeLogConsumer
      */
     private void processGetFile( String line )
     {
-        if ( line.length() == 0)
+        if ( line.length() == 0 )
         {
-            entries.add( currentChange );
+            if ( currentChange != null )
+            {
+                entries.add( currentChange );
+            }
             
             resetChangeLog();
             
