@@ -55,27 +55,27 @@ public class GitCheckInCommandTest
     public void testCommandLineWithEmptyTag()
         throws Exception
     {
-        testCommandLine( "scm:git:http://foo.com/git/trunk", "git-commit " + messageFileString );
+        testCommandLine( "scm:git:http://foo.com/git/trunk", "git-commit -a --verbose " + messageFileString );
     }
 
     public void testCommandLineWithoutTag()
         throws Exception
     {
-        testCommandLine( "scm:git:http://foo.com/git/trunk", "git-commit " + messageFileString );
+        testCommandLine( "scm:git:http://foo.com/git/trunk", "git-commit -a --verbose " + messageFileString );
     }
 
     public void testCommandLineTag()
         throws Exception
     {
         testCommandLine( "scm:git:http://anonymous@foo.com/git/trunk",
-                         "git-commit " + messageFileString );
+                         "git-commit -a --verbose " + messageFileString );
     }
 
     public void testCommandLineWithUsernameAndTag()
         throws Exception
     {
         testCommandLine( "scm:git:http://anonymous@foo.com/git/trunk",
-                         "git-commit " + messageFileString );
+                         "git-commit -a --verbose " + messageFileString );
     }
 
     // ----------------------------------------------------------------------

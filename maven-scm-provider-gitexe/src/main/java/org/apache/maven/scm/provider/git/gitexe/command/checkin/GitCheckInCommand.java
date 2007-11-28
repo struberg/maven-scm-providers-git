@@ -28,6 +28,8 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
+import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusCommand;
+import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusConsumer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -66,7 +68,20 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 
         try
         {
+            // git-commit doesn't show single files, but only summary :/
+            // so we must run git-status and consume the output
+            // borrow a few things from the git-status command
+            Commandline clStatus = GitStatusCommand.createCommandLine( repository, fileSet );
+            
+            GitStatusConsumer statusConsumer = new GitStatusConsumer( getLogger(), fileSet.getBasedir() );
+            exitCode = GitCommandLineUtils.execute( clStatus, statusConsumer, stderr, getLogger() );
+            if ( exitCode != 0 )
+            {
+                return new CheckInScmResult( clStatus.toString(), "The git command failed.", stderr.getOutput(), false );
+            }
+            
         	Commandline clCommit = createCommitCommandLine(repository, fileSet, messageFile);
+        	
         	
         	//X TODO consumer can't show files, only summary :/
         	//X TODO so we must run git-status and consume them
@@ -84,9 +99,7 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 	            return new CheckInScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
 	        }
 
-	        //X TODO use GitStatusConsumer 
-	        //X original: return new CheckInScmResult( cl.toString(), consumer.getCheckedInFiles() );
-	        return new CheckInScmResult( cl.toString(), null );
+	        return new CheckInScmResult( cl.toString(), statusConsumer.getChangedFiles() );
         }
         finally
         {
