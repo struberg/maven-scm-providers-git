@@ -34,17 +34,6 @@ import java.util.List;
 public class GitCheckInConsumer
     extends AbstractFileCheckingConsumer
 {
-    private final static String SENDING_TOKEN = "Sending        ";
-
-    private final static String ADDING_TOKEN = "Adding         ";
-
-    private final static String ADDING_BIN_TOKEN = "Adding  (bin)  ";
-
-    private final static String DELETING_TOKEN = "Deleting       ";
-
-    private final static String TRANSMITTING_TOKEN = "Transmitting file data";
-
-    private final static String COMMITTED_REVISION_TOKEN = "Committed revision";
 
     // ----------------------------------------------------------------------
     //
@@ -63,43 +52,7 @@ public class GitCheckInConsumer
     {
         String file;
 
-        if ( line.startsWith( COMMITTED_REVISION_TOKEN ) )
-        {
-            String revisionString = line.substring( COMMITTED_REVISION_TOKEN.length() + 1, line.length() - 1 );
-
-            revision = parseInt( revisionString );
-
-            return;
-        }
-        else if ( line.startsWith( SENDING_TOKEN ) )
-        {
-            file = line.substring( SENDING_TOKEN.length() );
-        }
-        else if ( line.startsWith( ADDING_TOKEN ) )
-        {
-            file = line.substring( ADDING_TOKEN.length() );
-        }
-        else if ( line.startsWith( ADDING_BIN_TOKEN ) )
-        {
-            file = line.substring( ADDING_BIN_TOKEN.length() );
-        }
-        else if ( line.startsWith( DELETING_TOKEN ) )
-        {
-            file = line.substring( DELETING_TOKEN.length() );
-        }
-        else if ( line.startsWith( TRANSMITTING_TOKEN ) )
-        {
-            // ignore
-            return;
-        }
-        else
-        {
-            logger.info( "Unknown line: '" + line + "'" );
-
-            return;
-        }
-
-        addFile( new ScmFile( file, ScmFileStatus.CHECKED_IN ) );
+   
     }
 
     public List getCheckedInFiles()

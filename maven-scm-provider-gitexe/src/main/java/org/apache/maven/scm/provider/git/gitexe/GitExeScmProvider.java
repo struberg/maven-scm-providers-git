@@ -28,6 +28,7 @@ import org.apache.maven.scm.provider.git.command.info.GitInfoScmResult;
 import org.apache.maven.scm.provider.git.gitexe.command.add.GitAddCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.branch.GitBranchCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.changelog.GitChangeLogCommand;
+import org.apache.maven.scm.provider.git.gitexe.command.checkin.GitCheckInCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.checkout.GitCheckOutCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.diff.GitDiffCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.remove.GitRemoveCommand;
@@ -61,7 +62,7 @@ public class GitExeScmProvider
 
     protected GitCommand getCheckInCommand()
     {
-        return null; //X TODO
+        return new GitCheckInCommand();
     }
 
     protected GitCommand getCheckOutCommand()

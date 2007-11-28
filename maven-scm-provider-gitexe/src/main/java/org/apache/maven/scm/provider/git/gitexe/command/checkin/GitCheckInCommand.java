@@ -48,6 +48,8 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
         CommandLineUtils.StringStreamConsumer stdout = new CommandLineUtils.StringStreamConsumer();
+        GitCheckInConsumer consumer = new GitCheckInConsumer( getLogger(), fileSet.getBasedir() );
+        
         int exitCode;
 
         File messageFile = FileUtils.createTempFile( "maven-scm-", ".commit", null );
@@ -63,17 +65,11 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 
         try
         {
-        	Commandline clAdd = createAddCommandLine(repository, fileSet);
-        	
-            exitCode = GitCommandLineUtils.execute( clAdd, stdout, stderr, getLogger() );
-	        if ( exitCode != 0 )
-	        {
-	            return new CheckInScmResult( clAdd.toString(), "The git command failed.", stderr.getOutput(), false );
-	        }
-
         	Commandline clCommit = createCommitCommandLine(repository, fileSet, messageFile);
         	
-            exitCode = GitCommandLineUtils.execute( clCommit, stdout, stderr, getLogger() );
+        	//X TODO consumer can't show files, only summary :/
+        	//X TODO so we must run git-status and consume them
+            exitCode = GitCommandLineUtils.execute( clCommit, consumer, stderr, getLogger() );
 	        if ( exitCode != 0 )
 	        {
 	            return new CheckInScmResult( clCommit.toString(), "The git command failed.", stderr.getOutput(), false );
@@ -81,9 +77,7 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 	        
 	        Commandline cl = createPushCommandLine( repository, fileSet, version );
 	
-	        GitCheckInConsumer consumer = new GitCheckInConsumer( getLogger(), fileSet.getBasedir() );
-	
-            exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
+            exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
 	        if ( exitCode != 0 )
 	        {
 	            return new CheckInScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
@@ -128,20 +122,14 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 	{
 		Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "commit");
 
+		cl.createArgument().setValue( "-a" );
+		cl.createArgument().setValue( "--verbose" );
+		
 		cl.createArgument().setValue( "-F" );
 		cl.createArgument().setValue( messageFile.getAbsolutePath() );
-		GitCommandLineUtils.addTarget( cl, fileSet.getFileList() );
-		
-		return cl;
-	}
-
-    public static Commandline createAddCommandLine( GitScmProviderRepository repository, ScmFileSet fileSet )
-	throws ScmException
-	{
-		Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "add");
 		
 		GitCommandLineUtils.addTarget( cl, fileSet.getFileList() );
-
+		
 		return cl;
 	}
 

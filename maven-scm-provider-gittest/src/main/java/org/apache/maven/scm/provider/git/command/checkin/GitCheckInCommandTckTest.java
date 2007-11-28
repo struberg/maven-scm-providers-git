@@ -34,12 +34,12 @@ public class GitCheckInCommandTckTest
     public String getScmUrl()
         throws Exception
     {
-        return GitScmTestUtils.getScmUrl( new File( getRepositoryRoot(), "trunk" ) );
+        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
     }
 
     public void initRepo()
         throws Exception
     {
-        GitScmTestUtils.initRepo( "src/test/tck-repository/", getRepositoryRoot(), getWorkingDirectory() );
+        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
 }

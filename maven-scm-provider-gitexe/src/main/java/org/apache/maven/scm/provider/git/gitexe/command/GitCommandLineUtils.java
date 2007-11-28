@@ -49,7 +49,7 @@ public class GitCommandLineUtils
         {
             File f = (File) i.next();
             // no setFile() since this screws up the working directory!
-            cl.createArgument().setValue( f.getName() );
+            cl.createArgument().setValue( f.toString() );
         }
 
     }
