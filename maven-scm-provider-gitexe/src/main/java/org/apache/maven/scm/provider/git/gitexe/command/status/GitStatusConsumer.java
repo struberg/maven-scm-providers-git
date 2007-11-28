@@ -22,6 +22,8 @@ package org.apache.maven.scm.provider.git.gitexe.command.status;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.log.ScmLogger;
+import org.apache.regexp.RE;
+import org.apache.regexp.RESyntaxException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
@@ -30,12 +32,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitStatusConsumer.java 525259 2007-04-03 20:03:53Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitStatusConsumer
     implements StreamConsumer
 {
+    /**
+     * The pattern used to match added file lines
+     */
+    private static final String ADDED_PATTERN = "^#\\s*new file:\\s*(.*)";
+
+    /**
+     * The pattern used to match modified file lines
+     */
+    private static final String MODIFIED_PATTERN = "^#\\s*modified:\\s*(.*)";
+    
+    /**
+     * The pattern used to match deleted file lines
+     */
+    private static final String DELETED_PATTERN = "^#\\s*deleted:\\s*(.*)";
+    
+    /**
+     * @see #ADDED_PATTERN
+     */
+    private RE addedRegexp;
+
+    /**
+     * @see #MODIFIED_PATTERN
+     */
+    private RE modifiedRegexp;
+    
+    /**
+     * @see #DELETED_PATTERN
+     */
+    private RE deletedRegexp;
+    
     private ScmLogger logger;
 
     private File workingDirectory;
@@ -49,8 +80,20 @@ public class GitStatusConsumer
     public GitStatusConsumer( ScmLogger logger, File workingDirectory )
     {
         this.logger = logger;
-
         this.workingDirectory = workingDirectory;
+        
+        try
+        {
+            addedRegexp    = new RE( ADDED_PATTERN    );
+            modifiedRegexp = new RE( MODIFIED_PATTERN );
+            deletedRegexp  = new RE( DELETED_PATTERN  );
+        }
+        catch ( RESyntaxException ex )
+        {
+            throw new RuntimeException(
+                "INTERNAL ERROR: Could not create regexp to parse git log file. This shouldn't happen. Something is probably wrong with the oro installation.",
+                ex );
+        }        
     }
 
     // ----------------------------------------------------------------------
@@ -60,130 +103,50 @@ public class GitStatusConsumer
     public void consumeLine( String line )
     {
         logger.debug( line );
-        if ( StringUtils.isEmpty( line.trim() ) )
+        if ( StringUtils.isEmpty( line ) )
         {
             return;
         }
 
-        if ( line.length() <= 7 )
+        if ( line.length() < 1 && line.charAt( 0 ) != '#' )
         {
-            logger.warn( "Unexpected input, the line must be at least seven characters long. Line: '" + line + "'." );
+            logger.warn( "Unexpected input, git-status lines must start with '#'. Line: '" + line + "'." );
 
             return;
         }
 
-        String statusString = line.substring( 0, 1 );
+        ScmFileStatus status = null;
+        
+        String file = null;
 
-        String file = line.substring( 7 );
-
-        ScmFileStatus status;
-
-        //  The first six columns in the output are each one character wide:
-        //    First column: Says if item was added, deleted, or otherwise changed
-        //      ' ' no modifications
-        //      'A' Added
-        //      'C' Conflicted
-        //      'D' Deleted
-        //      'I' Ignored
-        //      'M' Modified
-        //      'R' Replaced
-        //      'X' item is unversioned, but is used by an externals definition
-        //      '?' item is not under version control
-        //      '!' item is missing (removed by non-git command) or incomplete
-        //      '~' versioned item obstructed by some item of a different kind
-        //    Second column: Modifications of a file's or directory's properties
-        //      ' ' no modifications
-        //      'C' Conflicted
-        //      'M' Modified
-        //    Third column: Whether the working copy directory is locked
-        //      ' ' not locked
-        //      'L' locked
-        //    Fourth column: Scheduled commit will contain addition-with-history
-        //      ' ' no history scheduled with commit
-        //      '+' history scheduled with commit
-        //    Fifth column: Whether the item is switched relative to its parent
-        //      ' ' normal
-        //      'S' switched
-        //    Sixth column: Repository lock token
-        //      (without -u)
-        //      ' ' no lock token
-        //      'K' lock token present
-        //      (with -u)
-        //      ' ' not locked in repository, no lock token
-        //      'K' locked in repository, lock toKen present
-        //      'O' locked in repository, lock token in some Other working copy
-        //      'T' locked in repository, lock token present but sTolen
-        //      'B' not locked in repository, lock token present but Broken
-        //
-        //  The out-of-date information appears in the eighth column (with -u):
-        //      '*' a newer revision exists on the server
-        //      ' ' the working copy is up to date
-        if ( statusString.equals( "A" ) )
+        if ( addedRegexp.match( line ) ) 
         {
             status = ScmFileStatus.ADDED;
-        }
-        else if ( statusString.equals( "M" ) || statusString.equals( "R" ) || statusString.equals( "~" ) )
+            file = addedRegexp.getParen( 1 );
+        } 
+        else if ( modifiedRegexp.match( line ) ) 
         {
             status = ScmFileStatus.MODIFIED;
+            file = modifiedRegexp.getParen( 1 );
         }
-        else if ( statusString.equals( "D" ) )
+        else if ( deletedRegexp.match( line ) ) 
         {
             status = ScmFileStatus.DELETED;
+            file = deletedRegexp.getParen( 1 );
         }
-        else if ( statusString.equals( "?" ) )
+        
+        // If the file isn't a file; don't add it.
+        if ( file != null )
         {
-            status = ScmFileStatus.UNKNOWN;
-        }
-        else if ( statusString.equals( "!" ) )
-        {
-            status = ScmFileStatus.MISSING;
-        }
-        else if ( statusString.equals( "C" ) )
-        {
-            status = ScmFileStatus.CONFLICT;
-        }
-        else if ( statusString.equals( "L" ) )
-        {
-            status = ScmFileStatus.LOCKED;
-        }
-        else if ( statusString.equals( "X" ) )
-        {
-            //skip git:external entries
-            return;
-        }
-        else if ( statusString.equals( "I" ) )
-        {
-            //skip git:external entries
-            return;
-        }
-        else
-        {
-            //Parse the second column
-            statusString = line.substring( 1, 1 );
-
-            if ( statusString.equals( "M" ) )
+            if ( workingDirectory != null && !new File( workingDirectory, file ).isFile() )
             {
-                status = ScmFileStatus.MODIFIED;
-            }
-            else if ( statusString.equals( "C" ) )
-            {
-                status = ScmFileStatus.CONFLICT;
-            }
-            else
-            {
-                //The line isn't a status line, ie something like 'Performing status on external item at...'
-                //or a status defined in next columns
                 return;
             }
+            
+            changedFiles.add( new ScmFile( file, status ) );
         }
 
-        // If the file isn't a file; don't add it.
-        if ( !new File( workingDirectory, file ).isFile() )
-        {
-            return;
-        }
-
-        changedFiles.add( new ScmFile( file, status ) );
+        
     }
 
     public List getChangedFiles()

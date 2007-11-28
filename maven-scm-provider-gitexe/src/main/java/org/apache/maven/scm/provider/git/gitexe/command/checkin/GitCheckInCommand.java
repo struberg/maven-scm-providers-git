@@ -48,7 +48,8 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
         CommandLineUtils.StringStreamConsumer stdout = new CommandLineUtils.StringStreamConsumer();
-        GitCheckInConsumer consumer = new GitCheckInConsumer( getLogger(), fileSet.getBasedir() );
+
+        //X TODO use GitStatusConsumer GitCheckInConsumer consumer = new GitCheckInConsumer( getLogger(), fileSet.getBasedir() );
         
         int exitCode;
 
@@ -69,7 +70,7 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
         	
         	//X TODO consumer can't show files, only summary :/
         	//X TODO so we must run git-status and consume them
-            exitCode = GitCommandLineUtils.execute( clCommit, consumer, stderr, getLogger() );
+            exitCode = GitCommandLineUtils.execute( clCommit, stdout, stderr, getLogger() );
 	        if ( exitCode != 0 )
 	        {
 	            return new CheckInScmResult( clCommit.toString(), "The git command failed.", stderr.getOutput(), false );
@@ -83,7 +84,9 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 	            return new CheckInScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
 	        }
 
-	        return new CheckInScmResult( cl.toString(), consumer.getCheckedInFiles() );
+	        //X TODO use GitStatusConsumer 
+	        //X original: return new CheckInScmResult( cl.toString(), consumer.getCheckedInFiles() );
+	        return new CheckInScmResult( cl.toString(), null );
         }
         finally
         {
