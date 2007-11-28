@@ -20,7 +20,9 @@ package org.apache.maven.scm.provider.git.gitexe.command.checkin;
  */
 
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.checkin.AbstractCheckInCommand;
 import org.apache.maven.scm.command.checkin.CheckInScmResult;
@@ -36,6 +38,9 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
@@ -51,8 +56,6 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
         CommandLineUtils.StringStreamConsumer stdout = new CommandLineUtils.StringStreamConsumer();
 
-        //X TODO use GitStatusConsumer GitCheckInConsumer consumer = new GitCheckInConsumer( getLogger(), fileSet.getBasedir() );
-        
         int exitCode;
 
         File messageFile = FileUtils.createTempFile( "maven-scm-", ".commit", null );
@@ -99,7 +102,32 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 	            return new CheckInScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
 	        }
 
-	        return new CheckInScmResult( cl.toString(), statusConsumer.getChangedFiles() );
+	        List checkedInFiles = new ArrayList( statusConsumer.getChangedFiles().size() );
+	        
+	        // rewrite all detected files to now have status 'checked_in'
+	        for ( Iterator it = statusConsumer.getChangedFiles().iterator(); it.hasNext(); )
+	        {
+	            ScmFile scmfile = new ScmFile( ((ScmFile) it.next()).getPath(), ScmFileStatus.CHECKED_IN );
+	            
+	            if ( fileSet.getFileList().isEmpty() ) {
+	                checkedInFiles.add( scmfile );	                
+	            }
+	            else
+	            {
+	                // if a specific fileSet is given, we have to check if the file is really tracked
+	                for ( Iterator itfl = fileSet.getFileList().iterator(); itfl.hasNext(); )
+	                {
+	                    File f = (File) itfl.next();
+	                    if ( f.toString().equals( scmfile.getPath() )) 
+	                    {
+	                        checkedInFiles.add( scmfile );                  
+	                    }
+
+	                }
+	            }
+	        }
+	        
+	        return new CheckInScmResult( cl.toString(), checkedInFiles );
         }
         finally
         {
@@ -127,8 +155,6 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 
         //X TODO handle version
         
-        GitCommandLineUtils.addTarget( cl, fileSet.getFileList() );
-
         return cl;
     }
     
@@ -138,13 +164,21 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 	{
 		Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "commit");
 
-		cl.createArgument().setValue( "-a" );
 		cl.createArgument().setValue( "--verbose" );
 		
 		cl.createArgument().setValue( "-F" );
 		cl.createArgument().setValue( messageFile.getAbsolutePath() );
-		
-		GitCommandLineUtils.addTarget( cl, fileSet.getFileList() );
+
+		if ( fileSet.getFileList().isEmpty() ) 
+		{
+		    // commit all tracked files
+		    cl.createArgument().setValue( "-a" );
+		}
+		else 
+		{
+		    // specify exactly which files to commit 
+		    GitCommandLineUtils.addTarget( cl, fileSet.getFileList() );
+		}
 		
 		return cl;
 	}
