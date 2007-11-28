@@ -34,7 +34,7 @@ import java.util.List;
  * Command line construction utility.
  *
  * @author Brett Porter
- * @version $Id: GitCommandLineUtils.java 579982 2007-09-27 12:09:20Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitCommandLineUtils
 {
@@ -48,8 +48,21 @@ public class GitCommandLineUtils
         for ( Iterator i = files.iterator(); i.hasNext(); )
         {
             File f = (File) i.next();
+            String relativeFile = f.getPath();
+            
+            if ( f.getAbsolutePath().startsWith( cl.getWorkingDirectory().getAbsolutePath() ))
+            {
+                // so we can omit the starting characters
+                relativeFile = relativeFile.substring( cl.getWorkingDirectory().getAbsolutePath().length() );
+                
+                if ( relativeFile.startsWith( File.separator ) )
+                {
+                    relativeFile = relativeFile.substring( File.separator.length() );
+                }
+            }
+            
             // no setFile() since this screws up the working directory!
-            cl.createArgument().setValue( f.toString() );
+            cl.createArgument().setValue( relativeFile );
         }
 
     }

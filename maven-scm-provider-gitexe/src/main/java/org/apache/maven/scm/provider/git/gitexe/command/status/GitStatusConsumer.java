@@ -107,14 +107,7 @@ public class GitStatusConsumer
         {
             return;
         }
-
-        if ( line.length() < 1 && line.charAt( 0 ) != '#' )
-        {
-            logger.warn( "Unexpected input, git-status lines must start with '#'. Line: '" + line + "'." );
-
-            return;
-        }
-
+        
         ScmFileStatus status = null;
         
         String file = null;

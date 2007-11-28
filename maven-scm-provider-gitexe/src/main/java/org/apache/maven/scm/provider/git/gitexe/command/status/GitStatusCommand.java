@@ -27,7 +27,6 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
@@ -53,7 +52,8 @@ public class GitStatusCommand
         exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
-            return new StatusScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
+            // git-status returns non-zero if nothing to do
+            getLogger().info( "nothing added to commit but untracked files present (use \"git add\" to track)" );
         }
 
         return new StatusScmResult( cl.toString(), consumer.getChangedFiles() );

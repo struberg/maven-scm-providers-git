@@ -67,7 +67,7 @@ public class GitAddCommand
         return new AddScmResult( cl.toString(), consumer.getAddedFiles() );
     }
 
-    private static Commandline createCommandLine( File workingDirectory, List/*File*/ files )
+    public static Commandline createCommandLine( File workingDirectory, List/*File*/ files )
         throws ScmException
     {
         // Base command line doesn't make sense here - username/password not needed, and non-interactive is not valid

@@ -24,7 +24,6 @@ import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.log.ScmLogger;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

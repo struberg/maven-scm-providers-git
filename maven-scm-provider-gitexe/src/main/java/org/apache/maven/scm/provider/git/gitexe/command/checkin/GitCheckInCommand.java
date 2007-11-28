@@ -30,6 +30,7 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
+import org.apache.maven.scm.provider.git.gitexe.command.add.GitAddCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusConsumer;
 import org.codehaus.plexus.util.FileUtils;
@@ -71,6 +72,22 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
 
         try
         {
+            if ( !fileSet.getFileList().isEmpty() )
+            {
+                // if specific fileSet is given, we have to git-add them first
+                // otherwise we will use 'git-commit -a' later
+
+                Commandline clAdd = GitAddCommand.createCommandLine( fileSet.getBasedir(), fileSet.getFileList() );
+                
+                exitCode = GitCommandLineUtils.execute( clAdd, stdout, stderr, getLogger() );
+                
+                if ( exitCode != 0 )
+                {
+                    return new CheckInScmResult( clAdd.toString(), "The git command failed.", stderr.getOutput(), false );
+                }
+
+            }
+            
             // git-commit doesn't show single files, but only summary :/
             // so we must run git-status and consume the output
             // borrow a few things from the git-status command
@@ -80,14 +97,12 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
             exitCode = GitCommandLineUtils.execute( clStatus, statusConsumer, stderr, getLogger() );
             if ( exitCode != 0 )
             {
-                return new CheckInScmResult( clStatus.toString(), "The git command failed.", stderr.getOutput(), false );
+                // git-status returns non-zero if nothing to do
+                getLogger().info( "nothing added to commit but untracked files present (use \"git add\" to track)" );
             }
             
         	Commandline clCommit = createCommitCommandLine(repository, fileSet, messageFile);
         	
-        	
-        	//X TODO consumer can't show files, only summary :/
-        	//X TODO so we must run git-status and consume them
             exitCode = GitCommandLineUtils.execute( clCommit, stdout, stderr, getLogger() );
 	        if ( exitCode != 0 )
 	        {
