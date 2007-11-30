@@ -36,6 +36,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: GitRemoveCommand.java 538940 2007-05-17 14:27:28Z evenisse $
+ * TODO
  */
 public class GitRemoveCommand
     extends AbstractRemoveCommand

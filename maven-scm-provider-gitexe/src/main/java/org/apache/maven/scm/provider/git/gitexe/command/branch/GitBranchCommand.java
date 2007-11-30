@@ -59,7 +59,7 @@ public class GitBranchCommand
             throw new ScmException( "branch name must be specified" );
         }
 
-        if ( fileSet.getFiles().length != 0 )
+        if ( !fileSet.getFileList().isEmpty() )
         {
             throw new ScmException( "This provider doesn't support branching subsets of a directory" );
         }

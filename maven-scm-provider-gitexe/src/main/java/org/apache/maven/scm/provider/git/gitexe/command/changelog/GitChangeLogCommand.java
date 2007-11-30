@@ -83,7 +83,7 @@ public class GitChangeLogCommand
         exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
-            return new ChangeLogScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
+            return new ChangeLogScmResult( cl.toString(), "The git-log command failed.", stderr.getOutput(), false );
         }
         ChangeLogSet changeLogSet = new ChangeLogSet( consumer.getModifications(), startDate, endDate );
         changeLogSet.setStartVersion( startVersion );
@@ -103,7 +103,7 @@ public class GitChangeLogCommand
         SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
         dateFormat.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
         
-        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "whatchanged" );
+        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "log" );
 
         if ( startVersion != null ) {
             cl.createArgument().setValue( "--since=" + StringUtils.escape( startVersion.getName() ) );

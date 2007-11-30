@@ -83,7 +83,7 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
                 
                 if ( exitCode != 0 )
                 {
-                    return new CheckInScmResult( clAdd.toString(), "The git command failed.", stderr.getOutput(), false );
+                    return new CheckInScmResult( clAdd.toString(), "The git-add command failed.", stderr.getOutput(), false );
                 }
 
             }
@@ -106,7 +106,7 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
             exitCode = GitCommandLineUtils.execute( clCommit, stdout, stderr, getLogger() );
 	        if ( exitCode != 0 )
 	        {
-	            return new CheckInScmResult( clCommit.toString(), "The git command failed.", stderr.getOutput(), false );
+	            return new CheckInScmResult( clCommit.toString(), "The git-commit command failed.", stderr.getOutput(), false );
 	        }
 	        
 	        Commandline cl = createPushCommandLine( repository, fileSet, version );
@@ -114,7 +114,7 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
             exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
 	        if ( exitCode != 0 )
 	        {
-	            return new CheckInScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
+	            return new CheckInScmResult( cl.toString(), "The git-push command failed.", stderr.getOutput(), false );
 	        }
 
 	        List checkedInFiles = new ArrayList( statusConsumer.getChangedFiles().size() );
