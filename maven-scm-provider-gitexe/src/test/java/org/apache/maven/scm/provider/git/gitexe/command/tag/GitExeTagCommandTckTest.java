@@ -1,4 +1,4 @@
-package org.apache.maven.scm.provider.git.command.tag;
+package org.apache.maven.scm.provider.git.gitexe.command.tag;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,15 @@ package org.apache.maven.scm.provider.git.command.tag;
  * under the License.
  */
 
-import org.apache.maven.scm.provider.git.GitScmTestUtils;
-import org.apache.maven.scm.tck.command.tag.TagCommandTckTest;
+import org.apache.maven.scm.provider.git.command.tag.GitTagCommandTckTest;
 
 /**
  * This test tests the tag command.
  *
- * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id: GitExeTagCommandTckTest.java 531990 2007-04-24 15:55:06Z evenisse $
  */
-public class GitTagCommandTckTest
-    extends TagCommandTckTest
+public class GitExeTagCommandTckTest
+    extends GitTagCommandTckTest
 {
-    public String getScmUrl()
-        throws Exception
-    {
-        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
-    }
-
-    public void initRepo()
-        throws Exception
-    {
-        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
-    }
 }

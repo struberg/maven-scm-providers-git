@@ -33,6 +33,7 @@ import org.apache.maven.scm.provider.git.gitexe.command.checkout.GitCheckOutComm
 import org.apache.maven.scm.provider.git.gitexe.command.diff.GitDiffCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.remove.GitRemoveCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusCommand;
+import org.apache.maven.scm.provider.git.gitexe.command.tag.GitTagCommand;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 
 import java.io.File;
@@ -92,7 +93,7 @@ public class GitExeScmProvider
 
     protected GitCommand getTagCommand()
     {
-        return null; //X TODO
+        return new GitTagCommand();
     }
 
     protected GitCommand getUpdateCommand()

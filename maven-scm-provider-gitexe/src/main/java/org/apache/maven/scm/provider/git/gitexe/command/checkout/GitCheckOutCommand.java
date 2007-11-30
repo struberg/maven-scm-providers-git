@@ -29,6 +29,8 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
+import org.apache.maven.scm.provider.git.gitexe.command.list.GitListCommand;
+import org.apache.maven.scm.provider.git.gitexe.command.list.GitListConsumer;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -36,19 +38,16 @@ import org.codehaus.plexus.util.cli.Commandline;
 import java.io.File;
 
 /**
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitCheckOutCommand.java 524909 2007-04-02 20:02:44Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitCheckOutCommand
-    extends AbstractCheckOutCommand
-    implements GitCommand
+public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCommand
 {
     /**
      * For git, the given repository is a remote one.
      * We have to clone it first if the working directory does not contain a git repo yet,
      * otherwise we have to git-pull it.
      * 
-     * TODO We currently assume a '.git' directory. 
+     * TODO We currently assume a '.git' directory, so this does not work for --bare repos
      */
     protected CheckOutScmResult executeCheckOutCommand( ScmProviderRepository repo, ScmFileSet fileSet,
                                                         ScmVersion version )
@@ -78,7 +77,7 @@ public class GitCheckOutCommand
             exitCode = GitCommandLineUtils.execute( clPull, stdout, stderr, getLogger() );
             if ( exitCode != 0 )
             {
-                return new CheckOutScmResult( clPull.toString(), "The git command failed.", stderr.getOutput(), false );
+                return new CheckOutScmResult( clPull.toString(), "The git-pull command failed.", stderr.getOutput(), false );
             }
         }
         else 
@@ -90,36 +89,36 @@ public class GitCheckOutCommand
             }
             
             // no git repo seems to exist, let's clone the original repo
-            Commandline clClone = createCloneCommand( repository, fileSet.getBasedir(), version );
+            Commandline clClone = createCloneCommand( repository, fileSet.getBasedir() );
             
             exitCode = GitCommandLineUtils.execute( clClone, stdout, stderr, getLogger() );
             if ( exitCode != 0 )
             {
-                return new CheckOutScmResult( clClone.toString(), "The git command failed.", stderr.getOutput(), false );
+                return new CheckOutScmResult( clClone.toString(), "The git-clone command failed.", stderr.getOutput(), false );
             }
         }
         
         // and now lets do the git-checkout itself
         Commandline cl = createCommandLine( repository, fileSet.getBasedir(), version );
 
-        GitCheckOutConsumer consumer = new GitCheckOutConsumer( getLogger(), fileSet.getBasedir().getParentFile() );
-
         exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
         if ( exitCode != 0 )
         {
-            return new CheckOutScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
+            return new CheckOutScmResult( cl.toString(), "The git-checkout command failed.", stderr.getOutput(), false );
         }
 
         // and now search for the files
-        Commandline clList = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "ls-files" );
+        GitListConsumer listConsumer = new GitListConsumer( getLogger(), fileSet.getBasedir() );
+
+        Commandline clList = GitListCommand.createCommandLine( repository, fileSet.getBasedir() );
         
-        exitCode = GitCommandLineUtils.execute( clList, consumer, stderr, getLogger() );
+        exitCode = GitCommandLineUtils.execute( clList, listConsumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
-            return new CheckOutScmResult( clList.toString(), "The git command failed.", stderr.getOutput(), false );
+            return new CheckOutScmResult( clList.toString(), "The git-ls-files command failed.", stderr.getOutput(), false );
         }
 
-        return new CheckOutScmResult( cl.toString(), consumer.getCheckedOutFiles() );
+        return new CheckOutScmResult( cl.toString(), listConsumer.getListedFiles() );
     }
 
     // ----------------------------------------------------------------------
@@ -134,10 +133,7 @@ public class GitCheckOutCommand
         
         if ( version != null && StringUtils.isNotEmpty( version.getName() ) )
         {
-            if ( version instanceof ScmRevision )
-            {
-                cl.createArgument().setValue( version.getName() );
-            }
+            cl.createArgument().setValue( version.getName() );
         }
 
         return cl;
@@ -146,20 +142,11 @@ public class GitCheckOutCommand
     /**
      * create a git-clone repository command 
      */
-    private Commandline createCloneCommand( GitScmProviderRepository repository, File workingDirectory,
-                                            ScmVersion version )
+    private Commandline createCloneCommand( GitScmProviderRepository repository, File workingDirectory )
     {
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory.getParentFile(), "clone" );
         
         cl.createArgument().setValue( repository.getUrl() );
-        
-        if ( version != null && StringUtils.isNotEmpty( version.getName() ) )
-        {
-            if ( version instanceof ScmRevision )
-            {
-                cl.createArgument().setValue( version.getName() );
-            }
-        }
         
         cl.createArgument().setFile( workingDirectory );
         

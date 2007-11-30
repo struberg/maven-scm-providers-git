@@ -44,7 +44,7 @@ public class GitRemoveCommand
     protected ScmResult executeRemoveCommand( ScmProviderRepository repository, ScmFileSet fileSet, String message )
         throws ScmException
     {
-        if ( fileSet.getFiles().length == 0 )
+        if ( fileSet.getFileList().isEmpty() )
         {
             throw new ScmException( "You must provide at least one file/directory to remove" );
         }

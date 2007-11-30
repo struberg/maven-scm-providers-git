@@ -1,4 +1,4 @@
-package org.apache.maven.scm.provider.git.gitexe.command.checkout;
+package org.apache.maven.scm.provider.git.gitexe.command.list;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,49 +28,20 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitCheckOutConsumer.java 538853 2007-05-17 09:49:28Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitCheckOutConsumer
+public class GitListConsumer
     extends AbstractFileCheckingConsumer
 {
-    private final static String CHECKED_OUT_REVISION_TOKEN = "Checked out revision";
-
-    public GitCheckOutConsumer( ScmLogger logger, File workingDirectory )
+    public GitListConsumer( ScmLogger logger, File workingDirectory )
     {
         super( logger, workingDirectory );
     }
 
     protected void parseLine( String line )
     {
-        String statusString = line.substring( 0, 1 );
-
-        String file = line.substring( 3 ).trim();
-
-        ScmFileStatus status;
-
-        if ( line.startsWith( CHECKED_OUT_REVISION_TOKEN ) )
-        {
-            String revisionString = line.substring( CHECKED_OUT_REVISION_TOKEN.length() + 1, line.length() - 1 );
-
-            revision = parseInt( revisionString );
-
-            return;
-        }
-        else if ( statusString.equals( "A" ) )
-        {
-            status = ScmFileStatus.ADDED;
-        }
-        else if ( statusString.equals( "U" ) )
-        {
-            status = ScmFileStatus.UPDATED;
-        }
-        else
-        {
-            //Do nothing
-
-            return;
-        }
+        String file = line;
+        ScmFileStatus status = ScmFileStatus.CHECKED_IN;
 
         addFile( new ScmFile( file, status ) );
     }
@@ -79,7 +50,7 @@ public class GitCheckOutConsumer
     //
     // ----------------------------------------------------------------------
 
-    public List getCheckedOutFiles()
+    public List getListedFiles()
     {
         return getFiles();
     }

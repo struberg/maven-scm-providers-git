@@ -162,8 +162,8 @@ public class GitCheckInCommand extends AbstractCheckInCommand implements GitComm
     //
     // ----------------------------------------------------------------------
 
-    public static Commandline createPushCommandLine( GitScmProviderRepository repository, ScmFileSet fileSet
-    		                                       , ScmVersion version )
+    public static Commandline createPushCommandLine( GitScmProviderRepository repository, ScmFileSet fileSet,
+    		                                         ScmVersion version )
         throws ScmException
     {
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "push");

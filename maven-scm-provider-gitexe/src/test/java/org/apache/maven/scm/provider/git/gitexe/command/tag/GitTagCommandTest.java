@@ -1,4 +1,4 @@
-package org.apache.maven.scm.provider.git.gitexe.command.checkin;
+package org.apache.maven.scm.provider.git.gitexe.command.tag;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,6 +19,7 @@ package org.apache.maven.scm.provider.git.gitexe.command.checkin;
  * under the License.
  */
 
+import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmTestCase;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
@@ -28,9 +29,9 @@ import org.codehaus.plexus.util.cli.Commandline;
 import java.io.File;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitCheckInCommandTest
+public class GitTagCommandTest
     extends ScmTestCase
 {
     private File messageFile;
@@ -52,24 +53,28 @@ public class GitCheckInCommandTest
         messageFileString = "-F " + path;
     }
 
-    public void testCommandLineWithoutTag()
+    
+    public void testCommandLineTag()
         throws Exception
     {
-        testCommandLine( "scm:git:http://foo.com/git/trunk", "git-commit --verbose " + messageFileString + " -a" );
+        testCommandLine( "scm:git:http://foo.com/git/trunk"
+                       , "my-tag-1"
+                       , "git-tag " + messageFileString + " my-tag-1" );
     }
 
-    public void testCommandLineWithUsername()
+    public void testCommandLineWithUsernameAndTag()
         throws Exception
     {
-        testCommandLine( "scm:git:http://anonymous@foo.com/git/trunk",
-                         "git-commit --verbose " + messageFileString + " -a" );
+        testCommandLine( "scm:git:http://anonymous@foo.com/git/trunk"
+                       , "my-tag-1"  
+                       ,  "git-tag " + messageFileString + " my-tag-1" );
     }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    private void testCommandLine( String scmUrl, String commandLine )
+    private void testCommandLine( String scmUrl, String tag, String commandLine )
         throws Exception
     {
         File workingDirectory = getTestFile( "target/git-checkin-command-test" );
@@ -79,7 +84,7 @@ public class GitCheckInCommandTest
         GitScmProviderRepository gitRepository = (GitScmProviderRepository) repository.getProviderRepository();
 
         Commandline cl =
-            GitCheckInCommand.createCommitCommandLine( gitRepository, new ScmFileSet( workingDirectory ), messageFile );
+            GitTagCommand.createCommandLine( gitRepository, workingDirectory, tag, messageFile );
 
         assertEquals( commandLine, cl.toString() );
     }
