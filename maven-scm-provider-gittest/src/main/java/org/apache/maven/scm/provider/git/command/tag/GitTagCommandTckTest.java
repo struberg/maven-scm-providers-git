@@ -23,8 +23,6 @@ import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.tag.TagCommandTckTest;
 
 /**
- * This test tests the tag command.
- *
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitTagCommandTckTest

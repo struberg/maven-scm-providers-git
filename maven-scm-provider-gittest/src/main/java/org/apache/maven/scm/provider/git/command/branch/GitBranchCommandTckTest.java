@@ -23,10 +23,7 @@ import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.branch.BranchCommandTckTest;
 
 /**
- * This test tests the branch command.
- *
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitBranchCommandTckTest.java 527150 2007-04-10 15:03:27Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitBranchCommandTckTest
     extends BranchCommandTckTest
@@ -40,6 +37,6 @@ public class GitBranchCommandTckTest
     public void initRepo()
         throws Exception
     {
-        GitScmTestUtils.initRepo( "src/test/tck-repository/", getRepositoryRoot(), getWorkingDirectory() );
+        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
 }

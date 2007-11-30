@@ -22,13 +22,8 @@ package org.apache.maven.scm.provider.git.command.list;
 import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.list.ListCommandTckTest;
 
-import java.io.File;
-
 /**
- * Test for <code>list<code> command
- *
- * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @version $Id: GitListCommandTckTest.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitListCommandTckTest
     extends ListCommandTckTest
@@ -36,12 +31,12 @@ public class GitListCommandTckTest
     public String getScmUrl()
         throws Exception
     {
-        return GitScmTestUtils.getScmUrl( new File( getRepositoryRoot(), "trunk" ) );
+        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
     }
 
     public void initRepo()
         throws Exception
     {
-        GitScmTestUtils.initRepo( "src/test/tck-repository/", getRepositoryRoot(), getWorkingDirectory() );
+        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
 }

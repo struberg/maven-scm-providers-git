@@ -22,11 +22,8 @@ package org.apache.maven.scm.provider.git.command.update;
 import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.update.UpdateCommandTckTest;
 
-import java.io.File;
-
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitUpdateCommandTckTest.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitUpdateCommandTckTest
     extends UpdateCommandTckTest
@@ -34,12 +31,12 @@ public class GitUpdateCommandTckTest
     public String getScmUrl()
         throws Exception
     {
-        return GitScmTestUtils.getScmUrl( new File( getRepositoryRoot(), "trunk" ) );
+        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
     }
 
     public void initRepo()
         throws Exception
     {
-        GitScmTestUtils.initRepo( "src/test/tck-repository/", getRepositoryRoot(), getWorkingDirectory() );
+        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
 }

@@ -22,11 +22,8 @@ package org.apache.maven.scm.provider.git.command.checkin;
 import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.checkin.CheckInCommandTckTest;
 
-import java.io.File;
-
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitCheckInCommandTckTest.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitCheckInCommandTckTest
     extends CheckInCommandTckTest

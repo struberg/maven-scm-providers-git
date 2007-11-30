@@ -20,31 +20,39 @@ package org.apache.maven.scm.provider.git.gitexe.command.add;
  */
 
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmResult;
 import org.apache.maven.scm.command.add.AbstractAddCommand;
 import org.apache.maven.scm.command.add.AddScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
+import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusCommand;
+import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusConsumer;
+import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitAddCommand.java 538940 2007-05-17 14:27:28Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitAddCommand
     extends AbstractAddCommand
     implements GitCommand
 {
-    protected ScmResult executeAddCommand( ScmProviderRepository repository, ScmFileSet fileSet, String message,
+    protected ScmResult executeAddCommand( ScmProviderRepository repo, ScmFileSet fileSet, String message,
                                            boolean binary )
         throws ScmException
     {
+        GitScmProviderRepository repository = (GitScmProviderRepository) repo;
+        
         if ( fileSet.getFileList().isEmpty() )
         {
             throw new ScmException( "You must provide at least one file/directory to add" );
@@ -52,19 +60,48 @@ public class GitAddCommand
 
         Commandline cl = createCommandLine( fileSet.getBasedir(), fileSet.getFileList() );
 
-        GitAddConsumer consumer = new GitAddConsumer( getLogger() );
-
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
+        CommandLineUtils.StringStreamConsumer stdout = new CommandLineUtils.StringStreamConsumer();
 
         int exitCode;
 
-        exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
+        exitCode = GitCommandLineUtils.execute( cl, stdout, stderr, getLogger() );
         if ( exitCode != 0 )
         {
-            return new AddScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
+            return new AddScmResult( cl.toString(), "The git-add command failed.", stderr.getOutput(), false );
+        }
+        
+        // git-commit doesn't show single files, but only summary :/
+        // so we must run git-status and consume the output
+        // borrow a few things from the git-status command
+        Commandline clStatus = GitStatusCommand.createCommandLine( repository, fileSet );
+        
+        GitStatusConsumer statusConsumer = new GitStatusConsumer( getLogger(), fileSet.getBasedir() );
+        exitCode = GitCommandLineUtils.execute( clStatus, statusConsumer, stderr, getLogger() );
+        if ( exitCode != 0 )
+        {
+            // git-status returns non-zero if nothing to do
+            getLogger().info( "nothing added to commit but untracked files present (use \"git add\" to track)" );
         }
 
-        return new AddScmResult( cl.toString(), consumer.getAddedFiles() );
+        List changedFiles = new ArrayList();
+        
+        // rewrite all detected files to now have status 'checked_in'
+        for ( Iterator it = statusConsumer.getChangedFiles().iterator(); it.hasNext(); )
+        {
+            ScmFile scmfile = (ScmFile) it.next();
+            
+            // if a specific fileSet is given, we have to check if the file is really tracked
+            for ( Iterator itfl = fileSet.getFileList().iterator(); itfl.hasNext(); )
+            {
+                File f = (File) itfl.next();
+                if ( f.toString().equals( scmfile.getPath() )) 
+                {
+                    changedFiles.add( scmfile );                  
+                }
+            }
+        }        
+        return new AddScmResult( cl.toString(), changedFiles );
     }
 
     public static Commandline createCommandLine( File workingDirectory, List/*File*/ files )

@@ -22,11 +22,8 @@ package org.apache.maven.scm.provider.git.command.checkout;
 import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.checkout.CheckOutCommandTckTest;
 
-import java.io.File;
-
 /**
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitCheckOutCommandTckTest.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
 public class GitCheckOutCommandTckTest
     extends CheckOutCommandTckTest
@@ -34,7 +31,7 @@ public class GitCheckOutCommandTckTest
     public String getScmUrl()
         throws Exception
     {
-        return GitScmTestUtils.getScmUrl( new File( getRepositoryRoot(), "trunk" ) );
+        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
     }
 
     public void initRepo()
