@@ -66,13 +66,10 @@ public class GitChangeLogConsumerTest
             assertEquals( "Mark Struberg <struberg@yahoo.de>", entry.getAuthor() );
 
             assertNotNull( entry.getDate() );
-            System.out.println( "Date:" + entry.getDate() );
             
             assertTrue( entry.getComment() != null && entry.getComment().length() > 0 );
-            System.out.println( "Comment:" + entry.getComment() );
             
             assertNotNull( entry.getFiles() );
-            System.out.println( "Files:" + entry.getFiles() + "\n");
             assertFalse( entry.getFiles().isEmpty() );
         }    
         
@@ -119,13 +116,10 @@ public class GitChangeLogConsumerTest
             assertEquals( "Mark Struberg <struberg@yahoo.de>", entry.getAuthor() );
 
             assertNotNull( entry.getDate() );
-            System.out.println( "Date:" + entry.getDate() );
             
             assertTrue( entry.getComment() != null && entry.getComment().length() > 0 );
-            System.out.println( "Comment:" + entry.getComment() );
             
             assertNotNull( entry.getFiles() );
-            System.out.println( "Files:" + entry.getFiles() + "\n");
             assertFalse( entry.getFiles().isEmpty() );
         }    
         
