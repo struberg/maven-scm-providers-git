@@ -22,21 +22,31 @@ package org.apache.maven.scm.provider.git.gitexe.command.remove;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.log.ScmLogger;
+import org.apache.regexp.RE;
+import org.apache.regexp.RESyntaxException;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitRemoveConsumer.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitRemoveConsumer
-    implements StreamConsumer
+public class GitRemoveConsumer implements StreamConsumer
 {
+    /**
+     * The pattern used to match deleted file lines
+     */
+    private static final String REMOVED_PATTERN = "^rm\\s'(.*)'";
+
     private ScmLogger logger;
 
     private List removedFiles = new ArrayList();
+
+    /**
+     * @see #REMOVED_PATTERN
+     */
+    private RE removedRegexp;
 
     // ----------------------------------------------------------------------
     //
@@ -45,6 +55,16 @@ public class GitRemoveConsumer
     public GitRemoveConsumer( ScmLogger logger )
     {
         this.logger = logger;
+        try
+        {
+            removedRegexp = new RE( REMOVED_PATTERN );
+        }
+        catch ( RESyntaxException ex )
+        {
+            throw new RuntimeException(
+                "INTERNAL ERROR: Could not create regexp to parse git log file. This shouldn't happen. Something is probably wrong with the oro installation.",
+                ex );
+        }        
     }
 
     // ----------------------------------------------------------------------
@@ -53,31 +73,22 @@ public class GitRemoveConsumer
 
     public void consumeLine( String line )
     {
-        if ( line.length() <= 3 )
+        if ( line.length() <= 2 )
         {
-            logger.warn( "Unexpected input, the line must be at least three characters long. Line: '" + line + "'." );
-
             return;
         }
 
-        String statusString = line.substring( 0, 1 );
-
-        String file = line.substring( 3 );
-
-        ScmFileStatus status;
-
-        if ( statusString.equals( "D" ) )
+        if ( removedRegexp.match( line ) ) 
         {
-            status = ScmFileStatus.DELETED;
+        	String file = removedRegexp.getParen( 1 );
+            removedFiles.add( new ScmFile( file, ScmFileStatus.DELETED ) );
         }
         else
         {
-            logger.info( "Unknown file status: '" + statusString + "'." );
+            logger.info( "could not parse line: " + line );
 
             return;
         }
-
-        removedFiles.add( new ScmFile( file, status ) );
     }
 
     public List getRemovedFiles()

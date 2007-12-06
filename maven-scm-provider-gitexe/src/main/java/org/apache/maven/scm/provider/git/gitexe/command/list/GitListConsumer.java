@@ -33,17 +33,25 @@ import java.util.List;
 public class GitListConsumer
     extends AbstractFileCheckingConsumer
 {
-    public GitListConsumer( ScmLogger logger, File workingDirectory )
+	private ScmFileStatus fileStatus; 
+
+	/**
+	 * @param logger
+	 * @param workingDirectory
+	 * @param fileStatus will be used for each file found
+	 */
+    public GitListConsumer( ScmLogger logger, File workingDirectory, ScmFileStatus fileStatus )
     {
         super( logger, workingDirectory );
+        
+        this.fileStatus = fileStatus;
     }
 
     protected void parseLine( String line )
     {
         String file = line;
-        ScmFileStatus status = ScmFileStatus.CHECKED_IN;
 
-        addFile( new ScmFile( file, status ) );
+        addFile( new ScmFile( file, fileStatus ) );
     }
 
     // ----------------------------------------------------------------------

@@ -21,6 +21,7 @@ package org.apache.maven.scm.provider.git.gitexe.command.list;
 
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.list.AbstractListCommand;
 import org.apache.maven.scm.command.list.ListScmResult;
@@ -55,7 +56,9 @@ public class GitListCommand extends AbstractListCommand implements GitCommand
         int exitCode;
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
-        GitListConsumer consumer = new GitListConsumer( getLogger(), fileSet.getBasedir().getParentFile() );
+        GitListConsumer consumer = new GitListConsumer( getLogger()
+        		                                      , fileSet.getBasedir().getParentFile()
+        		                                      , ScmFileStatus.CHECKED_IN );
         
         Commandline cl = createCommandLine( repository, fileSet.getBasedir() );
 

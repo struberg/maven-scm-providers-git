@@ -20,18 +20,14 @@ package org.apache.maven.scm.provider.git.gitexe.command.tag;
  */
 
 import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmResult;
-import org.apache.maven.scm.ScmTag;
-import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.checkin.CheckInScmResult;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
 import org.apache.maven.scm.command.tag.AbstractTagCommand;
 import org.apache.maven.scm.command.tag.TagScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
-import org.apache.maven.scm.provider.git.GitCommandUtils;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
@@ -39,15 +35,11 @@ import org.apache.maven.scm.provider.git.gitexe.command.list.GitListCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.list.GitListConsumer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
@@ -59,7 +51,7 @@ public class GitTagCommand extends AbstractTagCommand implements GitCommand
     {
         if ( tag == null || StringUtils.isEmpty( tag.trim() ) )
         {
-            throw new ScmException( "tag must be specified" );
+            throw new ScmException( "tag name must be specified" );
         }
 
         if ( !fileSet.getFileList().isEmpty() )
@@ -95,7 +87,7 @@ public class GitTagCommand extends AbstractTagCommand implements GitCommand
             exitCode = GitCommandLineUtils.execute( clTag, stdout, stderr, getLogger() );
             if ( exitCode != 0 )
             {
-                return new CheckInScmResult( clTag.toString(), "The git-tag command failed.", stderr.getOutput(), false );
+                return new TagScmResult( clTag.toString(), "The git-tag command failed.", stderr.getOutput(), false );
             }
 
             // and now push the tag to the origin repository
@@ -104,11 +96,13 @@ public class GitTagCommand extends AbstractTagCommand implements GitCommand
             exitCode = GitCommandLineUtils.execute( clPush, stdout, stderr, getLogger() );
             if ( exitCode != 0 )
             {
-                return new CheckInScmResult( clPush.toString(), "The git-push command failed.", stderr.getOutput(), false );
+                return new TagScmResult( clPush.toString(), "The git-push command failed.", stderr.getOutput(), false );
             }
 
-            // and now search for the tagged files
-            GitListConsumer listConsumer = new GitListConsumer( getLogger(), fileSet.getBasedir() );
+            // plus search for the tagged files
+            GitListConsumer listConsumer = new GitListConsumer( getLogger()
+            		                                          , fileSet.getBasedir()
+            		                                          , ScmFileStatus.TAGGED );
 
             Commandline clList = GitListCommand.createCommandLine( repository, fileSet.getBasedir() );
             
@@ -159,8 +153,6 @@ public class GitTagCommand extends AbstractTagCommand implements GitCommand
           Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "push");
 
           cl.createArgument().setValue( "origin" );
-
-          
           cl.createArgument().setValue( tag );
           
           return cl;

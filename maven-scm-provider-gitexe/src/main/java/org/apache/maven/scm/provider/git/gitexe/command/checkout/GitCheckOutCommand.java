@@ -21,6 +21,7 @@ package org.apache.maven.scm.provider.git.gitexe.command.checkout;
 
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmRevision;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.checkout.AbstractCheckOutCommand;
@@ -67,20 +68,9 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
         
-        
-        if ( fileSet.getBasedir().exists() && 
-             new File( fileSet.getBasedir(), ".git" ).exists() ) 
-        {
-            // git repo exists, so we must git-pull the changes
-            Commandline clPull = createPullCommand( repository, fileSet.getBasedir(), version );
-            
-            exitCode = GitCommandLineUtils.execute( clPull, stdout, stderr, getLogger() );
-            if ( exitCode != 0 )
-            {
-                return new CheckOutScmResult( clPull.toString(), "The git-pull command failed.", stderr.getOutput(), false );
-            }
-        }
-        else 
+
+        if ( !fileSet.getBasedir().exists() || 
+             !( new File( fileSet.getBasedir(), ".git" ).exists() ) )
         {
             if ( fileSet.getBasedir().exists() ) 
             {
@@ -97,6 +87,19 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
                 return new CheckOutScmResult( clClone.toString(), "The git-clone command failed.", stderr.getOutput(), false );
             }
         }
+
+        if ( fileSet.getBasedir().exists() && 
+             new File( fileSet.getBasedir(), ".git" ).exists() ) 
+        {
+            // git repo exists, so we must git-pull the changes
+            Commandline clPull = createPullCommand( repository, fileSet.getBasedir(), version );
+            
+            exitCode = GitCommandLineUtils.execute( clPull, stdout, stderr, getLogger() );
+            if ( exitCode != 0 )
+            {
+                return new CheckOutScmResult( clPull.toString(), "The git-pull command failed.", stderr.getOutput(), false );
+            }
+        }
         
         // and now lets do the git-checkout itself
         Commandline cl = createCommandLine( repository, fileSet.getBasedir(), version );
@@ -108,7 +111,9 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
         }
 
         // and now search for the files
-        GitListConsumer listConsumer = new GitListConsumer( getLogger(), fileSet.getBasedir() );
+        GitListConsumer listConsumer = new GitListConsumer( getLogger()
+        		                                          , fileSet.getBasedir()
+        		                                          , ScmFileStatus.CHECKED_IN);
 
         Commandline clList = GitListCommand.createCommandLine( repository, fileSet.getBasedir() );
         
@@ -165,10 +170,7 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
         
         if ( version != null && StringUtils.isNotEmpty( version.getName() ) )
         {
-            if ( version instanceof ScmRevision )
-            {
-                cl.createArgument().setValue( version.getName() );
-            }
+            cl.createArgument().setValue( version.getName() + ":" + version.getName() );
         }
         return cl;
     }    

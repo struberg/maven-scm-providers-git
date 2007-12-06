@@ -22,7 +22,6 @@ package org.apache.maven.scm.provider.git.gitexe.command.add;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
-import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmResult;
 import org.apache.maven.scm.command.add.AbstractAddCommand;
 import org.apache.maven.scm.command.add.AddScmResult;
@@ -43,9 +42,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitAddCommand
-    extends AbstractAddCommand
-    implements GitCommand
+public class GitAddCommand extends AbstractAddCommand implements GitCommand
 {
     protected ScmResult executeAddCommand( ScmProviderRepository repo, ScmFileSet fileSet, String message,
                                            boolean binary )
@@ -71,7 +68,7 @@ public class GitAddCommand
             return new AddScmResult( cl.toString(), "The git-add command failed.", stderr.getOutput(), false );
         }
         
-        // git-commit doesn't show single files, but only summary :/
+        // git-add doesn't show single files, but only summary :/
         // so we must run git-status and consume the output
         // borrow a few things from the git-status command
         Commandline clStatus = GitStatusCommand.createCommandLine( repository, fileSet );
@@ -107,15 +104,8 @@ public class GitAddCommand
     public static Commandline createCommandLine( File workingDirectory, List/*File*/ files )
         throws ScmException
     {
-        // Base command line doesn't make sense here - username/password not needed, and non-interactive is not valid
-
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "add" );
 
-        cl.setWorkingDirectory( workingDirectory.getAbsolutePath() );
-
-        // verbosity needed for consumer
-        cl.createArgument().setValue( "-v" );
-        
         GitCommandLineUtils.addTarget( cl, files );
 
         return cl;

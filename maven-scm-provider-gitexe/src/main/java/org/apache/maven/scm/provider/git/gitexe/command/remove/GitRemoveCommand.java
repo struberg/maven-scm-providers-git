@@ -27,6 +27,7 @@ import org.apache.maven.scm.command.remove.RemoveScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
+import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
@@ -34,24 +35,22 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitRemoveCommand.java 538940 2007-05-17 14:27:28Z evenisse $
- * TODO
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitRemoveCommand
-    extends AbstractRemoveCommand
-    implements GitCommand
+public class GitRemoveCommand extends AbstractRemoveCommand implements GitCommand
 {
-    protected ScmResult executeRemoveCommand( ScmProviderRepository repository, ScmFileSet fileSet, String message )
+    protected ScmResult executeRemoveCommand( ScmProviderRepository repo, ScmFileSet fileSet, String message )
         throws ScmException
     {
+        GitScmProviderRepository repository = (GitScmProviderRepository) repo;
+
         if ( fileSet.getFileList().isEmpty() )
         {
             throw new ScmException( "You must provide at least one file/directory to remove" );
         }
 
         Commandline cl = createCommandLine( fileSet.getBasedir(), fileSet.getFileList() );
-
+        
         GitRemoveConsumer consumer = new GitRemoveConsumer( getLogger() );
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
@@ -67,20 +66,14 @@ public class GitRemoveCommand
         return new RemoveScmResult( cl.toString(), consumer.getRemovedFiles() );
     }
 
-    private static Commandline createCommandLine( File workingDirectory, List/*File*/ files )
-        throws ScmException
-    {
-        // Base command line doesn't make sense here - username/password not needed, and non-interactive/non-recusive is not valid
-
-        Commandline cl = new Commandline();
-
-        cl.setExecutable( "git" );
-        cl.setWorkingDirectory( workingDirectory.getAbsolutePath() );
-        cl.createArgument().setValue( "remove" );
-
-        GitCommandLineUtils.addTarget( cl, files );
-
-        return cl;
-    }
+    public static Commandline createCommandLine( File workingDirectory, List/*File*/ files )
+    throws ScmException
+	{
+	    Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "rm" );
+	
+	    GitCommandLineUtils.addTarget( cl, files );
+	
+	    return cl;
+	}
 
 }
