@@ -22,7 +22,7 @@ package org.apache.maven.scm.provider.git.gitexe.command.checkout;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmFileStatus;
-import org.apache.maven.scm.ScmRevision;
+import org.apache.maven.scm.ScmTag;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.checkout.AbstractCheckOutCommand;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
@@ -65,7 +65,6 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
         int exitCode;
 
         CommandLineUtils.StringStreamConsumer stdout = new CommandLineUtils.StringStreamConsumer();
-
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
         
 
@@ -170,7 +169,15 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
         
         if ( version != null && StringUtils.isNotEmpty( version.getName() ) )
         {
-            cl.createArgument().setValue( version.getName() + ":" + version.getName() );
+            if ( version instanceof ScmTag )
+            {
+            	cl.createArgument().setValue( "tag" );
+            	cl.createArgument().setValue( version.getName() );
+            }
+            else
+            {
+            	cl.createArgument().setValue( version.getName() + ":" + version.getName() );
+            }
         }
         return cl;
     }    
