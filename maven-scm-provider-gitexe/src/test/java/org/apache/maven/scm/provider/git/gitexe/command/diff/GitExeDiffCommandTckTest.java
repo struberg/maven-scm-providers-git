@@ -1,4 +1,4 @@
-package org.apache.maven.scm.provider.git.command.diff;
+package org.apache.maven.scm.provider.git.gitexe.command.diff;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,24 +19,12 @@ package org.apache.maven.scm.provider.git.command.diff;
  * under the License.
  */
 
-import org.apache.maven.scm.provider.git.GitScmTestUtils;
-import org.apache.maven.scm.tck.command.diff.DiffCommandTckTest;
+import org.apache.maven.scm.provider.git.command.diff.GitDiffCommandTckTest;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitDiffCommandTckTest
-    extends DiffCommandTckTest
+public class GitExeDiffCommandTckTest
+    extends GitDiffCommandTckTest
 {
-    public String getScmUrl()
-        throws Exception
-    {
-        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
-    }
-
-    public void initRepo()
-        throws Exception
-    {
-        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
-    }
 }

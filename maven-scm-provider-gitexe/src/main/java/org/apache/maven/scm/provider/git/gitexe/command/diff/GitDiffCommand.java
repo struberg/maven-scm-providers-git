@@ -27,7 +27,6 @@ import org.apache.maven.scm.command.diff.DiffScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.command.diff.GitDiffConsumer;
-import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -36,34 +35,35 @@ import org.codehaus.plexus.util.cli.Commandline;
 import java.io.File;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitDiffCommand.java 524909 2007-04-02 20:02:44Z evenisse $
- * TODO
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  */
-public class GitDiffCommand
-    extends AbstractDiffCommand
-    implements GitCommand
+public class GitDiffCommand extends AbstractDiffCommand implements GitCommand
 {
     protected DiffScmResult executeDiffCommand( ScmProviderRepository repo, ScmFileSet fileSet, ScmVersion startVersion,
                                                 ScmVersion endVersion )
         throws ScmException
     {
-        Commandline cl =
-            createCommandLine( (GitScmProviderRepository) repo, fileSet.getBasedir(), startVersion, endVersion );
-
         GitDiffConsumer consumer = new GitDiffConsumer( getLogger(), fileSet.getBasedir() );
-
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
-
         int exitCode;
 
-        exitCode = GitCommandLineUtils.execute( cl, consumer, stderr, getLogger() );
+        Commandline clDiff2Index = createCommandLine( fileSet.getBasedir(), startVersion, endVersion, false );
+
+        exitCode = GitCommandLineUtils.execute( clDiff2Index, consumer, stderr, getLogger() );
         if ( exitCode != 0 )
         {
-            return new DiffScmResult( cl.toString(), "The git command failed.", stderr.getOutput(), false );
+            return new DiffScmResult( clDiff2Index.toString(), "The git-diff command failed.", stderr.getOutput(), false );
         }
 
-        return new DiffScmResult( cl.toString(), consumer.getChangedFiles(), consumer.getDifferences(),
+        Commandline clDiff2Head = createCommandLine( fileSet.getBasedir(), startVersion, endVersion, true );
+
+        exitCode = GitCommandLineUtils.execute( clDiff2Head, consumer, stderr, getLogger() );
+        if ( exitCode != 0 )
+        {
+            return new DiffScmResult( clDiff2Head.toString(), "The git-diff command failed.", stderr.getOutput(), false );
+        }
+
+        return new DiffScmResult( clDiff2Index.toString(), consumer.getChangedFiles(), consumer.getDifferences(),
                                   consumer.getPatch() );
     }
 
@@ -71,25 +71,24 @@ public class GitDiffCommand
     //
     // ----------------------------------------------------------------------
 
-    public static Commandline createCommandLine( GitScmProviderRepository repository, File workingDirectory,
-                                                 ScmVersion startVersion, ScmVersion endVersion )
+    /**
+     * @param cached if <code>true</code> diff the index to the head, else diff the tree to the index
+     */
+    public static Commandline createCommandLine( File workingDirectory, ScmVersion startVersion, ScmVersion endVersion, boolean cached )
     {
-        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, null );
+        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "diff" );
 
-        cl.createArgument().setValue( "diff" );
+        if ( cached ) {
+        	cl.createArgument().setValue( "--cached" );
+        }
 
         if ( startVersion != null && StringUtils.isNotEmpty( startVersion.getName() ) )
         {
-            cl.createArgument().setValue( "-r" );
-
-            if ( endVersion != null && StringUtils.isNotEmpty( endVersion.getName() ) )
-            {
-                cl.createArgument().setValue( startVersion.getName() + ":" + endVersion.getName() );
-            }
-            else
-            {
-                cl.createArgument().setValue( startVersion.getName() );
-            }
+            cl.createArgument().setValue( startVersion.getName() );
+        }
+        if ( endVersion != null && StringUtils.isNotEmpty( endVersion.getName() ) )
+        {
+            cl.createArgument().setValue( endVersion.getName() );
         }
 
         return cl;
