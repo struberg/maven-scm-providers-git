@@ -145,7 +145,7 @@ public class GitScmProviderRepository
 
             if ( PROTOCOL_SSH.equals( getProtocol() ) ) 
             {
-                StringBuilder urlSb = new StringBuilder( getProtocol() );
+                StringBuffer urlSb = new StringBuffer( getProtocol() );
                 
                 urlSb.append( "://" );
                 
