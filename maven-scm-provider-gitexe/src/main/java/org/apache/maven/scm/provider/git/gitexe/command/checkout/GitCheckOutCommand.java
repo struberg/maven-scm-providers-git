@@ -179,6 +179,9 @@ public class GitCheckOutCommand extends AbstractCheckOutCommand implements GitCo
             	cl.createArgument().setValue( version.getName() + ":" + version.getName() );
             }
         }
+        else {
+        	cl.createArgument().setValue( "master" );
+        }
         return cl;
     }    
 }
