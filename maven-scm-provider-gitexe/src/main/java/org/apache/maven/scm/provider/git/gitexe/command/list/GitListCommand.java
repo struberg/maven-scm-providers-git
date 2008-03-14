@@ -57,7 +57,7 @@ public class GitListCommand extends AbstractListCommand implements GitCommand
 
         CommandLineUtils.StringStreamConsumer stderr = new CommandLineUtils.StringStreamConsumer();
         GitListConsumer consumer = new GitListConsumer( getLogger()
-        		                                      , fileSet.getBasedir().getParentFile()
+        		                                      , fileSet.getBasedir()
         		                                      , ScmFileStatus.CHECKED_IN );
         
         Commandline cl = createCommandLine( repository, fileSet.getBasedir() );

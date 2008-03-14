@@ -19,8 +19,17 @@ package org.apache.maven.scm.provider.git.command.list;
  * under the License.
  */
 
+import java.io.File;
+import java.util.List;
+
+import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.ScmVersion;
+import org.apache.maven.scm.command.checkout.CheckOutScmResult;
+import org.apache.maven.scm.command.list.ListScmResult;
+import org.apache.maven.scm.provider.ScmProvider;
 import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.list.ListCommandTckTest;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
@@ -39,4 +48,5 @@ public class GitListCommandTckTest
     {
         GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
+    
 }
