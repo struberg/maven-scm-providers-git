@@ -59,7 +59,7 @@ public class GitTagCommandTest
     {
         testCommandLine( "scm:git:http://foo.com/git/trunk"
                        , "my-tag-1"
-                       , "git-tag " + messageFileString + " my-tag-1" );
+                       , "git tag " + messageFileString + " my-tag-1" );
     }
 
     public void testCommandLineWithUsernameAndTag()
@@ -67,7 +67,7 @@ public class GitTagCommandTest
     {
         testCommandLine( "scm:git:http://anonymous@foo.com/git/trunk"
                        , "my-tag-1"  
-                       ,  "git-tag " + messageFileString + " my-tag-1" );
+                       ,  "git tag " + messageFileString + " my-tag-1" );
     }
 
     // ----------------------------------------------------------------------

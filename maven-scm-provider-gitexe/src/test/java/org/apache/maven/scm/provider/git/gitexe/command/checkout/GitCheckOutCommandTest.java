@@ -57,7 +57,7 @@ public class GitCheckOutCommandTest
         throws Exception
     {
         testCommandLine( getScmManager(), "scm:git:http://foo.com/git", "mybranch",
-                         "git-checkout mybranch" );
+                         "git checkout mybranch" );
     }
 
     // ----------------------------------------------------------------------

@@ -55,14 +55,14 @@ public class GitCheckInCommandTest
     public void testCommandLineWithoutTag()
         throws Exception
     {
-        testCommandLine( "scm:git:http://foo.com/git/trunk", "git-commit --verbose " + messageFileString + " -a" );
+        testCommandLine( "scm:git:http://foo.com/git/trunk", "git commit --verbose " + messageFileString + " -a" );
     }
 
     public void testCommandLineWithUsername()
         throws Exception
     {
         testCommandLine( "scm:git:http://anonymous@foo.com/git/trunk",
-                         "git-commit --verbose " + messageFileString + " -a" );
+                         "git commit --verbose " + messageFileString + " -a" );
     }
 
     // ----------------------------------------------------------------------

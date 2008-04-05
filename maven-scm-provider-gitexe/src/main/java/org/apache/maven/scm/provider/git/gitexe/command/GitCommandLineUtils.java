@@ -76,7 +76,9 @@ public class GitCommandLineUtils
         
         Commandline cl = new Commandline();
 
-        cl.setExecutable( "git" + "-" + command );
+        cl.setExecutable( "git" );
+        
+        cl.createArgument().setValue( command );
 
         cl.setWorkingDirectory( workingDirectory.getAbsolutePath() );
 
