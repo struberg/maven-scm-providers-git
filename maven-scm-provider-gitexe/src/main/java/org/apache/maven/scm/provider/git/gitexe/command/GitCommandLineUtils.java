@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @author Brett Porter
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
+ * @version $Id: GitCommandLineUtils.java 691832 2008-09-03 23:54:44Z vsiveton $
  */
 public class GitCommandLineUtils
 {
@@ -49,36 +50,36 @@ public class GitCommandLineUtils
         {
             File f = (File) i.next();
             String relativeFile = f.getPath();
-            
-            if ( f.getAbsolutePath().startsWith( cl.getWorkingDirectory().getAbsolutePath() ))
+
+            if ( f.getAbsolutePath().startsWith( cl.getWorkingDirectory().getAbsolutePath() ) )
             {
                 // so we can omit the starting characters
                 relativeFile = relativeFile.substring( cl.getWorkingDirectory().getAbsolutePath().length() );
-                
+
                 if ( relativeFile.startsWith( File.separator ) )
                 {
                     relativeFile = relativeFile.substring( File.separator.length() );
                 }
             }
-            
+
             // no setFile() since this screws up the working directory!
-            cl.createArgument().setValue( relativeFile );
+            cl.createArg().setValue( relativeFile );
         }
 
     }
 
     public static Commandline getBaseGitCommandLine( File workingDirectory, String command )
     {
-        if ( command == null || command.length() == 0) 
+        if ( command == null || command.length() == 0 )
         {
             return null;
         }
-        
+
         Commandline cl = new Commandline();
 
         cl.setExecutable( "git" );
-        
-        cl.createArgument().setValue( command );
+
+        cl.createArg().setValue( command );
 
         cl.setWorkingDirectory( workingDirectory.getAbsolutePath() );
 
@@ -89,10 +90,13 @@ public class GitCommandLineUtils
                                ScmLogger logger )
         throws ScmException
     {
-        logger.info( "Executing: " + cl );
-        logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( "Executing: " + cl );
+            logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
+        }
 
-    	int exitCode;
+        int exitCode;
         try
         {
             exitCode = CommandLineUtils.executeCommandLine( cl, consumer, stderr );
@@ -109,10 +113,13 @@ public class GitCommandLineUtils
                                CommandLineUtils.StringStreamConsumer stderr, ScmLogger logger )
     throws ScmException
     {
-        logger.info( "Executing: " + cl );
-        logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( "Executing: " + cl );
+            logger.info( "Working directory: " + cl.getWorkingDirectory().getAbsolutePath() );
+        }
 
-    	int exitCode;
+        int exitCode;
         try
         {
             exitCode = CommandLineUtils.executeCommandLine( cl, stdout, stderr );

@@ -30,7 +30,7 @@ import java.io.File;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitCheckOutCommandTest.java 524909 2007-04-02 20:02:44Z evenisse $
+ * @version $Id: GitCheckOutCommandTest.java 658820 2008-05-21 19:24:03Z evenisse $
  */
 public class GitCheckOutCommandTest
     extends ScmTestCase
@@ -56,8 +56,7 @@ public class GitCheckOutCommandTest
     public void testCommandLineWithBranch()
         throws Exception
     {
-        testCommandLine( getScmManager(), "scm:git:http://foo.com/git", "mybranch",
-                         "git checkout mybranch" );
+        testCommandLine( getScmManager(), "scm:git:http://foo.com/git", "mybranch", "git checkout mybranch" );
     }
 
     // ----------------------------------------------------------------------
@@ -71,9 +70,9 @@ public class GitCheckOutCommandTest
 
         GitScmProviderRepository gitRepository = (GitScmProviderRepository) repository.getProviderRepository();
 
-        Commandline cl = GitCheckOutCommand.createCommandLine( gitRepository, workingDirectory,
-                                                               new ScmRevision( revision ) );
+        Commandline cl =
+            GitCheckOutCommand.createCommandLine( gitRepository, workingDirectory, new ScmRevision( revision ) );
 
-        assertEquals( commandLine, cl.toString() );
+        assertCommandLine( commandLine, workingDirectory, cl );
     }
 }

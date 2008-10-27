@@ -23,7 +23,7 @@ import org.apache.maven.scm.provider.git.command.status.GitStatusCommandTckTest;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitExeStatusCommandTckTest.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitExeStatusCommandTckTest.java 645182 2008-04-05 21:58:41Z jvanzyl $
  */
 public class GitExeStatusCommandTckTest
     extends GitStatusCommandTckTest

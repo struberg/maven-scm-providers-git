@@ -31,6 +31,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
+ * @version $Id: GitRemoveConsumer.java 691832 2008-09-03 23:54:44Z vsiveton $
  */
 public class GitRemoveConsumer implements StreamConsumer
 {
@@ -64,13 +65,14 @@ public class GitRemoveConsumer implements StreamConsumer
             throw new RuntimeException(
                 "INTERNAL ERROR: Could not create regexp to parse git log file. This shouldn't happen. Something is probably wrong with the oro installation.",
                 ex );
-        }        
+        }
     }
 
     // ----------------------------------------------------------------------
     // StreamConsumer Implementation
     // ----------------------------------------------------------------------
 
+    /** {@inheritDoc} */
     public void consumeLine( String line )
     {
         if ( line.length() <= 2 )
@@ -78,14 +80,17 @@ public class GitRemoveConsumer implements StreamConsumer
             return;
         }
 
-        if ( removedRegexp.match( line ) ) 
+        if ( removedRegexp.match( line ) )
         {
-        	String file = removedRegexp.getParen( 1 );
+            String file = removedRegexp.getParen( 1 );
             removedFiles.add( new ScmFile( file, ScmFileStatus.DELETED ) );
         }
         else
         {
-            logger.info( "could not parse line: " + line );
+            if ( logger.isInfoEnabled() )
+            {
+                logger.info( "could not parse line: " + line );
+            }
 
             return;
         }

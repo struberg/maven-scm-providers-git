@@ -19,6 +19,7 @@ package org.apache.maven.scm.provider.git;
  * under the License.
  */
 
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -31,7 +32,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitConfigFileReader.java 521294 2007-03-22 14:40:14Z evenisse $
+ * @version $Id: GitConfigFileReader.java 660014 2008-05-25 18:44:48Z hboutemy $
  */
 public class GitConfigFileReader
 {
@@ -148,18 +149,8 @@ public class GitConfigFileReader
         }
         finally
         {
-            if ( reader != null )
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch ( IOException e )
-                {
-                    //Do nothing
-                }
-                reader = null;
-            }
+            IOUtil.close( reader );
+            reader = null;
         }
 
         return lines;

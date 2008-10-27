@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements.  See the NOTICE file
   ~ distributed with this work for additional information
@@ -18,28 +20,31 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>maven-scm-providers-git</artifactId>
-    <groupId>org.apache.maven.scm</groupId>
-    <version>1.1-SNAPSHOT</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.scm</groupId>
+    <artifactId>maven-scm-providers-git</artifactId>
+    <version>1.1.1-SNAPSHOT</version>
+  </parent>
+
   <artifactId>maven-scm-provider-git-commons</artifactId>
+
   <name>Maven SCM Git Provider - Common library</name>
-  <version>1.1-SNAPSHOT</version>
+  <description>Common library for SCM Git Provider.</description>
+
   <dependencies>
     <dependency>
       <groupId>regexp</groupId>
       <artifactId>regexp</artifactId>
-      <version>1.3</version>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0-alpha-15</version>
         <executions>
           <execution>
             <goals>

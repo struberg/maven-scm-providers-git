@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  * Command utilities for git commands.
  *
  * @author <a href="mailto:jerome@coffeebreaks.org">Jerome Lacoste</a>
- * @version $Id: GitCommandUtils.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitCommandUtils.java 690997 2008-09-01 15:29:28Z vsiveton $
  */
 public class GitCommandUtils
 {
@@ -50,16 +50,17 @@ public class GitCommandUtils
 
         Commandline cl = new Commandline();
 
-        cl.setExecutable( "git" + "-" + commandName );
+        cl.setExecutable( "git" );
 
         cl.setWorkingDirectory( fileSet.getBasedir().getAbsolutePath() );
 
-        if ( settings.getTraceGitCommand() != null)
+        if ( settings.getTraceGitCommand() != null )
         {
             cl.addEnvironment( "GIT_TRACE", settings.getTraceGitCommand() );
         }
 
-        cl.createArgument().setLine( options );
+        cl.createArg().setLine( options );
+        cl.createArg().setValue( commandName );
 
         return cl;
     }

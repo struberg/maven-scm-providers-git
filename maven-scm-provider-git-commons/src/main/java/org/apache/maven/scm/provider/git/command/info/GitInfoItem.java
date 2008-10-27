@@ -21,8 +21,7 @@ package org.apache.maven.scm.provider.git.command.info;
 
 /**
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- *         <p/>
- *         $Id: GitInfoItem.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitInfoItem.java 685548 2008-08-13 13:35:49Z vsiveton $
  */
 public class GitInfoItem
 {

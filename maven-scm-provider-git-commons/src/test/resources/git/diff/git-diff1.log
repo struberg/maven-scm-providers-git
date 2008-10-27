@@ -1,8 +1,7 @@
-diff --git a/readme.txt b/readme.txt
-index fea1611..9e131cf 100644
---- a/readme.txt
-+++ b/readme.txt
-@@ -1 +1 @@
--/readme.txt
-\ No newline at end of file
-+new version of /readme.txt
+diff --git a/olamy.test b/olamy.test
+index 83fecd7..a64804b 100644
+--- a/olamy.test
++++ b/olamy.test
+@@ -1 +1,2 @@
+ test olamy
++new line

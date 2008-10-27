@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitUpdateScmResult.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitUpdateScmResult.java 645182 2008-04-05 21:58:41Z jvanzyl $
  * @deprecated
  */
 public class GitUpdateScmResult

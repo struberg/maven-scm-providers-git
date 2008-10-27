@@ -1,9 +1,0 @@
-maven-scm-provider-gitexe
-=============================
-
-2008-03-14 mark struberg
-
-@carlos sanchez
-The current TCK test for the ScmListCommand does not apply a standard working directory.
-This prevents the distributed git repository (offline mode) from being listed by the 
-maven-scm-provider.

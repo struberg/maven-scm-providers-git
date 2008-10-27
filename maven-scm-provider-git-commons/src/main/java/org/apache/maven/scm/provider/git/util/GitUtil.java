@@ -21,16 +21,16 @@ package org.apache.maven.scm.provider.git.util;
 
 import org.apache.maven.scm.providers.gitlib.settings.Settings;
 import org.apache.maven.scm.providers.gitlib.settings.io.xpp3.GitXpp3Reader;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitUtil.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitUtil.java 686374 2008-08-15 21:30:03Z vsiveton $
  */
 public class GitUtil
 {
@@ -48,7 +48,7 @@ public class GitUtil
             GitXpp3Reader reader = new GitXpp3Reader();
             try
             {
-                return reader.read( new FileReader( settingsFile ) );
+                return reader.read( ReaderFactory.newXmlReader( settingsFile ) );
             }
             catch ( FileNotFoundException e )
             {
@@ -62,7 +62,7 @@ public class GitUtil
             {
                 String message = settingsFile.getAbsolutePath() + " isn't well formed. SKIPPED." + e.getMessage();
 
-                System.out.println( message );
+                System.err.println( message );
             }
         }
 

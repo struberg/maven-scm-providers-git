@@ -24,16 +24,19 @@ import org.apache.maven.scm.tck.command.branch.BranchCommandTckTest;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
+ * @version $Id: GitBranchCommandTckTest.java 685548 2008-08-13 13:35:49Z vsiveton $
  */
 public class GitBranchCommandTckTest
     extends BranchCommandTckTest
 {
+    /** {@inheritDoc} */
     public String getScmUrl()
         throws Exception
     {
         return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
     }
 
+    /** {@inheritDoc} */
     public void initRepo()
         throws Exception
     {

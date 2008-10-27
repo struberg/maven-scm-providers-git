@@ -19,6 +19,11 @@ package org.apache.maven.scm.provider.git.gitexe.command.changelog;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.maven.scm.ChangeFile;
 import org.apache.maven.scm.log.ScmLogger;
 import org.apache.maven.scm.provider.git.GitChangeSet;
@@ -26,20 +31,18 @@ import org.apache.maven.scm.util.AbstractConsumer;
 import org.apache.regexp.RE;
 import org.apache.regexp.RESyntaxException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
+ * @version $Id: GitChangeLogConsumer.java 687485 2008-08-20 21:59:06Z olamy $
  */
 public class GitChangeLogConsumer
     extends AbstractConsumer
 {
     /**
      * Date formatter for git timestamp
+     * we use iso format cli git log --date=iso sample : 2008-08-06 01:37:18 +0200
      */
-    private static final String GIT_TIMESTAMP_PATTERN = "MMM dd HH:mm:ss yyyy Z";
+    private static final String GIT_TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss Z";
 
     /**
      * State machine constant: expecting header
@@ -50,12 +53,12 @@ public class GitChangeLogConsumer
      * State machine constant: expecting author information
      */
     private static final int STATUS_GET_AUTHOR = 2;
-    
+
     /**
      * State machine constant: expecting date information
      */
     private static final int STATUS_GET_DATE = 3;
-    
+
     /**
      * State machine constant: expecting file information
      */
@@ -66,7 +69,6 @@ public class GitChangeLogConsumer
      */
     private static final int STATUS_GET_COMMENT = 5;
 
-    
     /**
      * The pattern used to match git header lines
      */
@@ -80,14 +82,13 @@ public class GitChangeLogConsumer
     /**
      * The pattern used to match git date lines
      */
-    private static final String DATE_PATTERN = "^Date:\\s*\\w\\w\\w\\s(.*)";
+    private static final String DATE_PATTERN = "^Date:\\s*(.*)";
 
     /**
      * The pattern used to match git file lines
      */
-//X    private static final String FILE_PATTERN = "^:\\d* \\d* [:xdigit:]*\\.* [:xdigit:]*\\.* ([:upper:]) (.*)";
     private static final String FILE_PATTERN = "^:\\d* \\d* [:xdigit:]*\\.* [:xdigit:]*\\.* ([:upper:])\\t(.*)";
-    
+
     /**
      * Current status of the parser
      */
@@ -122,18 +123,17 @@ public class GitChangeLogConsumer
      * The regular expression used to match author lines
      */
     private RE authorRegexp;
-    
+
     /**
      * The regular expression used to match date lines
      */
     private RE dateRegexp;
-    
+
     /**
      * The regular expression used to match file lines
      */
     private RE fileRegexp;
-    
-    
+
     private String userDateFormat;
 
     /**
@@ -149,22 +149,22 @@ public class GitChangeLogConsumer
         {
             headerRegexp = new RE( HEADER_PATTERN );
             authorRegexp = new RE( AUTHOR_PATTERN );
-            dateRegexp   = new RE( DATE_PATTERN   );
-            fileRegexp   = new RE( FILE_PATTERN   );
+            dateRegexp = new RE( DATE_PATTERN );
+            fileRegexp = new RE( FILE_PATTERN );
         }
         catch ( RESyntaxException ex )
         {
             throw new RuntimeException(
-                "INTERNAL ERROR: Could not create regexp to parse git log file. This shouldn't happen. Something is probably wrong with the oro installation.",
-                ex );
+                                        "INTERNAL ERROR: Could not create regexp to parse git log file. This shouldn't happen. Something is probably wrong with the oro installation.",
+                                        ex );
         }
     }
 
     public List getModifications()
     {
-        // this is needed since the processFile does not always get a the end-sequence correctly. 
+        // this is needed since the processFile does not always get a the end-sequence correctly.
         processGetFile( "" );
-        
+
         return entries;
     }
 
@@ -172,6 +172,7 @@ public class GitChangeLogConsumer
     // StreamConsumer Implementation
     // ----------------------------------------------------------------------
 
+    /** {@inheritDoc} */
     public void consumeLine( String line )
     {
         switch ( status )
@@ -183,7 +184,7 @@ public class GitChangeLogConsumer
                 processGetAuthor( line );
                 break;
             case STATUS_GET_DATE:
-                processGetDate( line );
+                processGetDate( line, null );
                 break;
             case STATUS_GET_COMMENT:
                 processGetComment( line );
@@ -219,7 +220,7 @@ public class GitChangeLogConsumer
         currentRevision = headerRegexp.getParen( 1 );
 
         currentChange = new GitChangeSet();
-        
+
         status = STATUS_GET_AUTHOR;
     }
 
@@ -236,9 +237,9 @@ public class GitChangeLogConsumer
             return;
         }
         String author = authorRegexp.getParen( 1 );
-        
+
         currentChange.setAuthor( author );
-        
+
         status = STATUS_GET_DATE;
     }
 
@@ -248,19 +249,19 @@ public class GitChangeLogConsumer
      *
      * @param line a line of text from the git log output
      */
-    private void processGetDate( String line )
+    private void processGetDate( String line, Locale locale )
     {
         if ( !dateRegexp.match( line ) )
         {
             return;
         }
-        
+
         String datestring = dateRegexp.getParen( 1 );
-        
-        Date date = parseDate( datestring.trim() , userDateFormat, GIT_TIMESTAMP_PATTERN );
-        
+
+        Date date = parseDate( datestring.trim(), userDateFormat, GIT_TIMESTAMP_PATTERN, locale );
+
         currentChange.setDate( date );
-        
+
         status = STATUS_GET_COMMENT;
     }
 
@@ -274,7 +275,7 @@ public class GitChangeLogConsumer
     {
         if ( line.length() < 4 )
         {
-            if (currentComment == null)
+            if ( currentComment == null )
             {
                 currentComment = new StringBuffer();
             }
@@ -284,12 +285,13 @@ public class GitChangeLogConsumer
                 status = STATUS_GET_FILE;
             }
         }
-        else 
+        else
         {
-            if ( currentComment.length() > 0 ) {
+            if ( currentComment.length() > 0 )
+            {
                 currentComment.append( '\n' );
             }
-            
+
             currentComment.append( line.substring( 4 ) );
         }
     }
@@ -310,9 +312,9 @@ public class GitChangeLogConsumer
             {
                 entries.add( currentChange );
             }
-            
+
             resetChangeLog();
-            
+
             status = STATUS_GET_HEADER;
         }
         else
@@ -323,15 +325,16 @@ public class GitChangeLogConsumer
             }
             // String action = fileRegexp.getParen( 1 );
             // action is currently not used
-            
+
             String name = fileRegexp.getParen( 2 );
-            
+
             currentChange.addFile( new ChangeFile( name, currentRevision ) );
         }
     }
 
-    private void resetChangeLog() {
-    	currentComment = null;
-    	currentChange = null;
+    private void resetChangeLog()
+    {
+        currentComment = null;
+        currentChange = null;
     }
 }

@@ -41,14 +41,16 @@ import java.util.TimeZone;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitChangeLogCommand.java 527433 2007-04-11 09:36:08Z evenisse $
+ * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
+ * @version $Id: GitChangeLogCommand.java 690997 2008-09-01 15:29:28Z vsiveton $
  */
 public class GitChangeLogCommand
     extends AbstractChangeLogCommand
     implements GitCommand
 {
-    private final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss Z";
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss Z";
 
+    /** {@inheritDoc} */
     protected ChangeLogScmResult executeChangeLogCommand( ScmProviderRepository repo, ScmFileSet fileSet,
                                                           ScmVersion startVersion, ScmVersion endVersion,
                                                           String datePattern )
@@ -57,6 +59,7 @@ public class GitChangeLogCommand
         return executeChangeLogCommand( repo, fileSet, null, null, null, datePattern, startVersion, endVersion );
     }
 
+    /** {@inheritDoc} */
     protected ChangeLogScmResult executeChangeLogCommand( ScmProviderRepository repo, ScmFileSet fileSet,
                                                           Date startDate, Date endDate, ScmBranch branch,
                                                           String datePattern )
@@ -96,37 +99,44 @@ public class GitChangeLogCommand
     //
     // ----------------------------------------------------------------------
 
+    /**
+     * @TODO branch handling  
+     */
     public static Commandline createCommandLine( GitScmProviderRepository repository, File workingDirectory,
                                                  ScmBranch branch, Date startDate, Date endDate,
                                                  ScmVersion startVersion, ScmVersion endVersion )
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
         dateFormat.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-        
+
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "log" );
 
-        if ( startVersion != null ) {
-            cl.createArgument().setValue( "--since=" + StringUtils.escape( startVersion.getName() ) );
+        if ( startVersion != null )
+        {
+            cl.createArg().setValue( "--since=" + StringUtils.escape( startVersion.getName() ) );
         }
-        else 
+        else
         {
             if ( startDate != null )
             {
-                cl.createArgument().setValue( "--since=" + StringUtils.escape( dateFormat.format( startDate ) ) );
+                cl.createArg().setValue( "--since=" + StringUtils.escape( dateFormat.format( startDate ) ) );
             }
         }
-        
-        if ( endVersion != null ) {
-            cl.createArgument().setValue( "--until=" + StringUtils.escape( endVersion.getName() ) );
+
+        if ( endVersion != null )
+        {
+            cl.createArg().setValue( "--until=" + StringUtils.escape( endVersion.getName() ) );
         }
         else
         {
             if ( endDate != null )
             {
-                cl.createArgument().setValue( "--until=" + StringUtils.escape( dateFormat.format( endDate ) ) );
+                cl.createArg().setValue( "--until=" + StringUtils.escape( dateFormat.format( endDate ) ) );
             }
         }
-        
+
+        cl.createArg().setValue( "--date=iso" );
+
         return cl;
     }
 }

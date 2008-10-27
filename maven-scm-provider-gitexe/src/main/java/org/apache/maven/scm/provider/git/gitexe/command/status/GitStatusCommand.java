@@ -32,12 +32,13 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitStatusCommand.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitStatusCommand.java 691810 2008-09-03 22:38:28Z vsiveton $
  */
 public class GitStatusCommand
     extends AbstractStatusCommand
     implements GitCommand
 {
+    /** {@inheritDoc} */
     protected StatusScmResult executeStatusCommand( ScmProviderRepository repo, ScmFileSet fileSet )
         throws ScmException
     {
@@ -53,7 +54,10 @@ public class GitStatusCommand
         if ( exitCode != 0 )
         {
             // git-status returns non-zero if nothing to do
-            getLogger().info( "nothing added to commit but untracked files present (use \"git add\" to track)" );
+            if ( getLogger().isInfoEnabled() )
+            {
+                getLogger().info( "nothing added to commit but untracked files present (use \"git add\" to track)" );
+            }
         }
 
         return new StatusScmResult( cl.toString(), consumer.getChangedFiles() );

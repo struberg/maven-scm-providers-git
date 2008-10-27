@@ -35,86 +35,98 @@ import org.apache.maven.scm.provider.git.gitexe.command.list.GitListCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.remove.GitRemoveCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.status.GitStatusCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.tag.GitTagCommand;
+import org.apache.maven.scm.provider.git.gitexe.command.update.GitUpdateCommand;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 
 import java.io.File;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitExeScmProvider.java 527150 2007-04-10 15:03:27Z evenisse $
+ * @version $Id: GitExeScmProvider.java 687485 2008-08-20 21:59:06Z olamy $
  * @plexus.component role="org.apache.maven.scm.provider.ScmProvider" role-hint="git"
  */
 public class GitExeScmProvider
     extends AbstractGitScmProvider
 {
+    /** {@inheritDoc} */
     protected GitCommand getAddCommand()
     {
         return new GitAddCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getBranchCommand()
     {
         return new GitBranchCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getChangeLogCommand()
     {
         return new GitChangeLogCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getCheckInCommand()
     {
         return new GitCheckInCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getCheckOutCommand()
     {
         return new GitCheckOutCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getDiffCommand()
     {
         return new GitDiffCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getExportCommand()
     {
         return null; //X TODO
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getRemoveCommand()
     {
         return new GitRemoveCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getStatusCommand()
     {
         return new GitStatusCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getTagCommand()
     {
         return new GitTagCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getUpdateCommand()
     {
-        return null; //X TODO
+        return new GitUpdateCommand();
     }
 
+    /** {@inheritDoc} */
     protected GitCommand getListCommand()
     {
         return new GitListCommand();
     }
 
+    /** {@inheritDoc} */
     public GitCommand getInfoCommand()
     {
         return null; //X TODO
     }
 
-    /**
-     * Implements retrieving the repository url for a certain path using the 'git info' command.
-     */
+    /** {@inheritDoc} */
     protected String getRepositoryURL( File path )
         throws ScmException
     {
@@ -124,8 +136,8 @@ public class GitExeScmProvider
 
         if ( result.getInfoItems().size() != 1 )
         {
-            throw new ScmRepositoryException( "Cannot find URL: " +
-                ( result.getInfoItems().size() == 0 ? "no" : "multiple" ) + " items returned by the info command" );
+            throw new ScmRepositoryException( "Cannot find URL: "
+                + ( result.getInfoItems().size() == 0 ? "no" : "multiple" ) + " items returned by the info command" );
         }
 
         return ( (GitInfoItem) result.getInfoItems().get( 0 ) ).getURL();

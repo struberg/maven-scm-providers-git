@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitChangeSet.java 523077 2007-03-27 21:02:18Z evenisse $
+ * @version $Id: GitChangeSet.java 687472 2008-08-20 21:33:40Z olamy $
  */
 public class GitChangeSet
     extends ChangeSet
@@ -41,16 +41,30 @@ public class GitChangeSet
         super();
     }
 
-    public GitChangeSet( String strDate, String userDatePattern, String comment, String author, List/*<ChangeFile>*/ files )
+    /**
+     * @param strDate
+     * @param userDatePattern
+     * @param comment
+     * @param author
+     * @param files List of {@link ChangeFile}
+     */
+    public GitChangeSet( String strDate, String userDatePattern, String comment, String author, List files )
     {
         super( strDate, userDatePattern, comment, author, files );
     }
 
-    public GitChangeSet( Date date, String comment, String author, List/*<ChangeFile>*/ files )
+    /**
+     * @param date
+     * @param comment
+     * @param author
+     * @param files List of {@link ChangeFile}
+     */
+    public GitChangeSet( Date date, String comment, String author, List files )
     {
         super( date, comment, author, files );
     }
 
+    /** {@inheritDoc} */
     public boolean containsFilename( String filename, ScmProviderRepository repository )
     {
         GitScmProviderRepository repo = (GitScmProviderRepository) repository;

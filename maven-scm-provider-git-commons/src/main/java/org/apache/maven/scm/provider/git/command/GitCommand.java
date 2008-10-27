@@ -23,7 +23,7 @@ import org.apache.maven.scm.command.Command;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitCommand.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitCommand.java 645182 2008-04-05 21:58:41Z jvanzyl $
  */
 public interface GitCommand
     extends Command

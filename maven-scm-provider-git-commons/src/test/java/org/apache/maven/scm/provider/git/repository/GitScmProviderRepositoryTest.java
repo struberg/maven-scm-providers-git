@@ -26,7 +26,7 @@ import org.apache.maven.scm.repository.ScmRepositoryException;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitScmProviderRepositoryTest.java 535886 2007-05-07 14:35:46Z evenisse $
+ * @version $Id: GitScmProviderRepositoryTest.java 645182 2008-04-05 21:58:41Z jvanzyl $
  */
 public class GitScmProviderRepositoryTest
     extends ScmTestCase

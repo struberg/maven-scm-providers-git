@@ -22,6 +22,7 @@ package org.apache.maven.scm.provider.git;
 import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -32,7 +33,7 @@ import java.io.IOException;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitScmTestUtils.java 483105 2006-12-06 15:07:54Z evenisse $
+ * @version $Id: GitScmTestUtils.java 691192 2008-09-02 10:48:32Z vsiveton $
  */
 public final class GitScmTestUtils
 {
@@ -44,9 +45,9 @@ public final class GitScmTestUtils
         throws IOException
     {
         initRepo( "src/test/repository/", repository, workingDirectory );
-    
+
         FileUtils.deleteDirectory( assertionDirectory );
-    
+
         Assert.assertTrue( assertionDirectory.mkdirs() );
     }
 
@@ -55,15 +56,15 @@ public final class GitScmTestUtils
     {
         // Copy the repository to target
         File src = PlexusTestCase.getTestFile( source );
-    
+
         FileUtils.deleteDirectory( repository );
-    
+
         Assert.assertTrue( repository.mkdirs() );
-    
+
         FileUtils.copyDirectoryStructure( src, repository );
-    
+
         FileUtils.deleteDirectory( workingDirectory );
-    
+
         Assert.assertTrue( workingDirectory.mkdirs() );
     }
 
@@ -80,9 +81,9 @@ public final class GitScmTestUtils
 
             cl.setExecutable( "cygpath" );
 
-            cl.createArgument().setValue( "--unix" );
+            cl.createArg().setValue( "--unix" );
 
-            cl.createArgument().setValue( repositoryRoot );
+            cl.createArg().setValue( repositoryRoot );
 
             CommandLineUtils.StringStreamConsumer stdout = new CommandLineUtils.StringStreamConsumer();
 
@@ -95,7 +96,7 @@ public final class GitScmTestUtils
 
             repositoryRoot = stdout.getOutput().trim();
         }
-        else if ( System.getProperty( "os.name" ).startsWith( "Windows" ) )
+        else if ( Os.isFamily( "windows" ) )
         {
             repositoryRoot = "/" + StringUtils.replace( repositoryRoot, "\\", "/" );
         }

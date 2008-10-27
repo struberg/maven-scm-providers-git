@@ -25,7 +25,7 @@ import org.apache.maven.scm.provider.git.command.tag.GitTagCommandTckTest;
  * This test tests the tag command.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: GitExeTagCommandTckTest.java 531990 2007-04-24 15:55:06Z evenisse $
+ * @version $Id: GitExeTagCommandTckTest.java 645182 2008-04-05 21:58:41Z jvanzyl $
  */
 public class GitExeTagCommandTckTest
     extends GitTagCommandTckTest
