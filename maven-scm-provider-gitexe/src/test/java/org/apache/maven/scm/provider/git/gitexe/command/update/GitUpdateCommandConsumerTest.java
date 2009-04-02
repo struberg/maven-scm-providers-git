@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.ReaderFactory;
 /**
  * @author <a href="mailto:olamy@apache.org">olamy</a>
  * @since 10 août 2008
- * @version $Id: GitUpdateCommandConsumerTest.java 684601 2008-08-10 21:49:32Z olamy $
+ * @version $Id: GitUpdateCommandConsumerTest.java 755751 2009-03-18 21:52:02Z olamy $
  */
 public class GitUpdateCommandConsumerTest
     extends PlexusTestCase
@@ -98,8 +98,10 @@ public class GitUpdateCommandConsumerTest
     
     
     
-    // utils methods
-
+    // ----------------------------------------------------------------------
+    // private helper functions
+    // ----------------------------------------------------------------------
+    
     private void assertOneUpdate( String fileName )
         throws Exception
     {

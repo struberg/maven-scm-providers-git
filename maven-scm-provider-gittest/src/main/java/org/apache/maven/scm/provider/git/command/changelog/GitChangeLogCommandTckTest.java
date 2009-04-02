@@ -1,5 +1,8 @@
 package org.apache.maven.scm.provider.git.command.changelog;
 
+import org.apache.maven.scm.provider.git.GitScmTestUtils;
+import org.apache.maven.scm.tck.command.changelog.ChangeLogCommandTckTest;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +12,7 @@ package org.apache.maven.scm.provider.git.command.changelog;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,12 +22,8 @@ package org.apache.maven.scm.provider.git.command.changelog;
  * under the License.
  */
 
-import org.apache.maven.scm.provider.git.GitScmTestUtils;
-import org.apache.maven.scm.tck.command.changelog.ChangeLogCommandTckTest;
-
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
- * @version $Id: GitChangeLogCommandTckTest.java 685548 2008-08-13 13:35:49Z vsiveton $
  */
 public class GitChangeLogCommandTckTest
     extends ChangeLogCommandTckTest
@@ -42,4 +41,5 @@ public class GitChangeLogCommandTckTest
     {
         GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
+
 }

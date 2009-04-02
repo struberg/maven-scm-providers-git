@@ -52,7 +52,7 @@ import java.util.List;
  *
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: AbstractGitScmProvider.java 687472 2008-08-20 21:33:40Z olamy $
+ * @version $Id: AbstractGitScmProvider.java 712872 2008-11-10 23:25:31Z olamy $
  */
 public abstract class AbstractGitScmProvider
     extends AbstractScmProvider
@@ -206,7 +206,8 @@ public abstract class AbstractGitScmProvider
         }
         else if ( url.startsWith( GitScmProviderRepository.PROTOCOL_GIT ) )
         {
-            if ( !url.startsWith( GitScmProviderRepository.PROTOCOL_GIT + "://" ) )
+            if ( ( !url.startsWith( GitScmProviderRepository.PROTOCOL_GIT + "://" ) )
+                && ( !url.startsWith( GitScmProviderRepository.PROTOCOL_GIT + "@" ) ) )
             {
                 result.messages.add( "A git 'git' url must be on the form 'git://'." );
 

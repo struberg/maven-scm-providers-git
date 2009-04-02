@@ -1,5 +1,7 @@
 package org.apache.maven.scm.provider.git.gitexe.command.changelog;
 
+import org.apache.maven.scm.provider.git.command.changelog.GitChangeLogCommandTckTest;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +11,7 @@ package org.apache.maven.scm.provider.git.gitexe.command.changelog;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,13 +21,11 @@ package org.apache.maven.scm.provider.git.gitexe.command.changelog;
  * under the License.
  */
 
-import org.apache.maven.scm.provider.git.command.changelog.GitChangeLogCommandTckTest;
-
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
- * @version $Id: GitExeCheckInCommandTckTest.java 645182 2008-04-05 21:58:41Z jvanzyl $
  */
 public class GitExeChangeLogCommandTckTest
     extends GitChangeLogCommandTckTest
 {
+    // no-op
 }

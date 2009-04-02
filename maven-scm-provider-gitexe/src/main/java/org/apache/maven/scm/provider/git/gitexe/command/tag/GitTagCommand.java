@@ -19,37 +19,45 @@ package org.apache.maven.scm.provider.git.gitexe.command.tag;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmResult;
+import org.apache.maven.scm.ScmTagParameters;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
 import org.apache.maven.scm.command.tag.AbstractTagCommand;
 import org.apache.maven.scm.command.tag.TagScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
-import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.apache.maven.scm.provider.git.gitexe.command.GitCommandLineUtils;
 import org.apache.maven.scm.provider.git.gitexe.command.list.GitListCommand;
 import org.apache.maven.scm.provider.git.gitexe.command.list.GitListConsumer;
+import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
- * @version $Id: GitTagCommand.java 690997 2008-09-01 15:29:28Z vsiveton $
+ * @version $Id: GitTagCommand.java 754778 2009-03-15 22:26:37Z olamy $
  */
 public class GitTagCommand
     extends AbstractTagCommand
     implements GitCommand
 {
-    /** {@inheritDoc} */
+    
     public ScmResult executeTagCommand( ScmProviderRepository repo, ScmFileSet fileSet, String tag, String message )
+        throws ScmException
+    {
+        return executeTagCommand( repo, fileSet, tag, new ScmTagParameters( message ) );
+    }
+    
+    /** {@inheritDoc} */
+    public ScmResult executeTagCommand( ScmProviderRepository repo, ScmFileSet fileSet, String tag, ScmTagParameters scmTagParameters )
         throws ScmException
     {
         if ( tag == null || StringUtils.isEmpty( tag.trim() ) )
@@ -68,7 +76,7 @@ public class GitTagCommand
 
         try
         {
-            FileUtils.fileWrite( messageFile.getAbsolutePath(), message );
+            FileUtils.fileWrite( messageFile.getAbsolutePath(), scmTagParameters.getMessage() );
         }
         catch ( IOException ex )
         {
