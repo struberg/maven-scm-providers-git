@@ -41,7 +41,7 @@ import java.util.TimeZone;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitChangeLogCommand.java 761048 2009-04-01 20:29:33Z olamy $
+ * @version $Id: GitChangeLogCommand.java 769975 2009-04-29 22:31:22Z olamy $
  */
 public class GitChangeLogCommand
     extends AbstractChangeLogCommand

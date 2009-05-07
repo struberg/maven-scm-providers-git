@@ -41,7 +41,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
- * @version $Id: GitAddCommand.java 691810 2008-09-03 22:38:28Z vsiveton $
+ * @version $Id: GitAddCommand.java 769959 2009-04-29 21:59:38Z olamy $
  */
 public class GitAddCommand
     extends AbstractAddCommand
