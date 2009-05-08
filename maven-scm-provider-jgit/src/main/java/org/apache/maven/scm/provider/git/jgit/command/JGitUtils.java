@@ -1,10 +1,17 @@
 package org.apache.maven.scm.provider.git.jgit.command;
 
+import java.io.File;
+import java.util.List;
+
+import org.apache.maven.scm.ScmBranch;
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmFileStatus;
+import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.log.ScmLogger;
 import org.spearce.jgit.lib.ProgressMonitor;
 import org.spearce.jgit.lib.TextProgressMonitor;
+import org.spearce.jgit.simple.SimpleRepository;
 import org.spearce.jgit.simple.LsFileEntry.FileStatus;
 
 /*
@@ -69,10 +76,53 @@ public class JGitUtils
             case KILLED:
                 return ScmFileStatus.CONFLICT;
             case OTHER:
-                return ScmFileStatus.UNKNOWN;
+                return ScmFileStatus.ADDED;
             default:
                 throw new ScmException("unknown FileStatus: " + status);
                  
         }
     }
+    
+    /**
+     * get the branch name from the ScmVersion
+     * @param scmVersion
+     * @return branch name if the ScmVersion indicates a branch, <code>&quot;master&quot;</code> otherwise
+     */
+    public static String getBranchName( ScmVersion scmVersion )
+    {
+        String branchName = "master";
+        if (scmVersion instanceof ScmBranch)
+        {
+            branchName = scmVersion.getName();
+        }
+        
+        return branchName;
+    }
+    
+    /**
+     * Add all files of the given fileSet to the SimpleRepository.
+     * This will make all relative paths be under the repositories base directory. 
+     * 
+     * @param srep
+     * @param fileSet
+     * @throws Exception
+     */
+    public static void addAllFiles( SimpleRepository srep, ScmFileSet fileSet ) throws Exception {
+        @SuppressWarnings("unchecked")
+        List<File> addFiles = fileSet.getFileList();
+        if ( addFiles != null )
+        {
+            for ( File addFile : addFiles )
+            {
+                if ( !addFile.isAbsolute() )
+                {
+                    addFile = new File( fileSet.getBasedir(), addFile.getPath() );
+                }
+                
+                srep.add( addFile, false );
+            }
+
+        }
+    }
+
 }

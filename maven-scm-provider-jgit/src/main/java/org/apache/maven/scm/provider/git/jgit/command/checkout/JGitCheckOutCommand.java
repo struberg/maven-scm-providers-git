@@ -23,8 +23,6 @@ import org.apache.maven.scm.ScmBranch;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
-import org.apache.maven.scm.ScmFileStatus;
-import org.apache.maven.scm.ScmTag;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.checkout.AbstractCheckOutCommand;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
@@ -32,17 +30,12 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.spearce.jgit.errors.CorruptObjectException;
 import org.spearce.jgit.lib.ProgressMonitor;
 import org.spearce.jgit.simple.LsFileEntry;
 import org.spearce.jgit.simple.SimpleRepository;
 import org.spearce.jgit.transport.URIish;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,41 +65,28 @@ public class JGitCheckOutCommand
         {
             throw new ScmException( "remote repository must not be the working directory" );
         }
-
-        SimpleRepository srep;
-        ProgressMonitor monitor = JGitUtils.getMonitor( getLogger() );
-
-        String branch = "master";
-        if (version instanceof ScmBranch)
-        {
-            branch = version.getName();
-        }
         
-        if ( !fileSet.getBasedir().exists() || !( new File( fileSet.getBasedir(), ".git" ).exists() ) )
-        {
-            if ( fileSet.getBasedir().exists() )
-            {
-                // git refuses to clone otherwise
-                fileSet.getBasedir().delete();
-            }
-
+        try {
             
-            // no git repo seems to exist, let's clone the original repo
-            try
+            SimpleRepository srep;
+            ProgressMonitor monitor = JGitUtils.getMonitor( getLogger() );
+    
+            String branch = JGitUtils.getBranchName( version );
+            
+            if ( !fileSet.getBasedir().exists() || !( new File( fileSet.getBasedir(), ".git" ).exists() ) )
             {
+                if ( fileSet.getBasedir().exists() )
+                {
+                    // git refuses to clone otherwise
+                    fileSet.getBasedir().delete();
+                }
+    
+                
+                // no git repo seems to exist, let's clone the original repo
                 URIish uri = new URIish(repository.getUrl());
                 srep = SimpleRepository.clone( fileSet.getBasedir(), "origin", uri, branch, monitor );
-            
             }
-            catch ( Exception e )
-            {
-                //X TODO humm what should we give em finally?
-                return new CheckOutScmResult("", "JGit clone failed.", e.getMessage(),  false );
-            }
-        }
-        else
-        {
-            try 
+            else
             {
                 srep = SimpleRepository.existing( fileSet.getBasedir() );
                 
@@ -120,24 +100,20 @@ public class JGitCheckOutCommand
                 URIish uri = new URIish(repository.getUrl());
                 srep.pull( uri, branch ); 
             }
-            catch (Exception e)
-            {
-                return new CheckOutScmResult( "", "JGit pull failed.", e.getMessage(), false );
-            }
-        }
-        
-        List<ScmFile> listedFiles = new ArrayList<ScmFile>();
-        try {
-            List<LsFileEntry> fileEntries = srep.lsFiles( true, false, false );
+            
+            List<ScmFile> listedFiles = new ArrayList<ScmFile>();
+            List<LsFileEntry> fileEntries = srep.lsFiles();
             for (LsFileEntry entry : fileEntries)
             {
                 listedFiles.add( new ScmFile(entry.getFilePath(), JGitUtils.getScmFileStatus( entry.getStatus() ) ) );
             }
-        } catch( Exception e ) {
-            throw new ScmException("failed to list files in the git repository", e);
+            
+            return new CheckOutScmResult("checkout via JGit", listedFiles );
         }
-        
-        return new CheckOutScmResult("checkout via JGit", listedFiles );
+        catch (Exception e)
+        {
+            throw new ScmException( "JGit checkout failure!", e );
+        }
     }
 
 }

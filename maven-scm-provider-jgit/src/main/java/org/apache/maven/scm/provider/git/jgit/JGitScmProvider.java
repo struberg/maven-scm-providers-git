@@ -25,6 +25,8 @@ import org.apache.maven.scm.provider.git.AbstractGitScmProvider;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.command.info.GitInfoItem;
 import org.apache.maven.scm.provider.git.command.info.GitInfoScmResult;
+import org.apache.maven.scm.provider.git.jgit.command.add.JGitAddCommand;
+import org.apache.maven.scm.provider.git.jgit.command.checkin.JGitCheckInCommand;
 import org.apache.maven.scm.provider.git.jgit.command.checkout.JGitCheckOutCommand;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 
@@ -41,7 +43,7 @@ public class JGitScmProvider
     /** {@inheritDoc} */
     protected GitCommand getAddCommand()
     {
-        return null;
+        return new JGitAddCommand();
     }
 
     /** {@inheritDoc} */
@@ -59,7 +61,7 @@ public class JGitScmProvider
     /** {@inheritDoc} */
     protected GitCommand getCheckInCommand()
     {
-        return null;
+        return new JGitCheckInCommand();
     }
 
     /** {@inheritDoc} */
