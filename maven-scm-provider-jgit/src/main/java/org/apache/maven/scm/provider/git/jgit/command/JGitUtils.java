@@ -12,7 +12,10 @@ import org.apache.maven.scm.log.ScmLogger;
 import org.spearce.jgit.lib.ProgressMonitor;
 import org.spearce.jgit.lib.TextProgressMonitor;
 import org.spearce.jgit.simple.SimpleRepository;
-import org.spearce.jgit.simple.LsFileEntry.FileStatus;
+import org.spearce.jgit.simple.StatusEntry;
+import org.spearce.jgit.simple.LsFileEntry.LsFileStatus;
+import org.spearce.jgit.simple.StatusEntry.IndexStatus;
+import org.spearce.jgit.simple.StatusEntry.RepoStatus;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -62,25 +65,41 @@ public class JGitUtils
      * @return the matching ScmFileStatus
      * @throws ScmException if the given Status cannot be translated
      */
-    public static ScmFileStatus getScmFileStatus( FileStatus status ) 
+    public static ScmFileStatus getScmFileStatus( StatusEntry status ) 
     throws ScmException {
+        IndexStatus is = status.getIndexStatus();
+        RepoStatus  rs = status.getRepoStatus();
+        
+        if ( is.equals( IndexStatus.UNCHANGED ) && rs.equals( RepoStatus.UNCHANGED ) ) 
+        {
+            return ScmFileStatus.CHECKED_IN; 
+        }
+        else if ( is.equals( IndexStatus.ADDED ) && rs.equals( RepoStatus.ADDED ) ) 
+        {
+            return ScmFileStatus.ADDED; 
+        }
+        else if ( is.equals( IndexStatus.UNTRACKED ) || is.equals( IndexStatus.MODIFIED ) )
+        {
+            return ScmFileStatus.MODIFIED;
+        }
+        else if ( is.equals( IndexStatus.DELETED ) && rs.equals( RepoStatus.REMOVED ) )
+        {
+            return ScmFileStatus.DELETED;
+        }
+        else {
+            return ScmFileStatus.UNKNOWN;
+        }
+        
+        /*X 
         switch (status) {
-            case CACHED: 
-                return ScmFileStatus.CHECKED_IN;
-            case CHANGED:
-                return ScmFileStatus.MODIFIED;
             case UNMERGED:
-                return ScmFileStatus.CONFLICT;
-            case REMOVED:
-                return ScmFileStatus.DELETED;
-            case KILLED:
                 return ScmFileStatus.CONFLICT;
             case OTHER:
                 return ScmFileStatus.ADDED;
             default:
-                throw new ScmException("unknown FileStatus: " + status);
                  
         }
+        */
     }
     
     /**

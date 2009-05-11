@@ -19,8 +19,12 @@ package org.apache.maven.scm.provider.git.command.checkout;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.tck.command.checkout.CheckOutCommandTckTest;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
@@ -42,4 +46,5 @@ public class GitCheckOutCommandTckTest
     {
         GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
     }
+    
 }

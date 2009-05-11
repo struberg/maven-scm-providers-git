@@ -63,6 +63,9 @@ public final class GitScmTestUtils
 
         FileUtils.copyDirectoryStructure( src, repository );
 
+        // now let's get rid of all .svn directories in the copied folder
+        deleteAllDirectories( repository, ".svn" );
+
         FileUtils.deleteDirectory( workingDirectory );
 
         Assert.assertTrue( workingDirectory.mkdirs() );
@@ -103,4 +106,30 @@ public final class GitScmTestUtils
 
         return "scm:git:file://" + repositoryRoot;
     }
+    
+    
+    public static void deleteAllDirectories( File startDirectory, String pattern ) 
+    throws IOException
+    {
+        if ( startDirectory.isDirectory() ) 
+        {
+            File[] childs = startDirectory.listFiles();
+            for ( int i = 0; i < childs.length; i++ )
+            {
+                File child = childs[ i ];
+                if ( child.isDirectory() )
+                {
+                    if ( child.getName().equals( pattern ) )
+                    {
+                        FileUtils.deleteDirectory( child );
+                    }
+                    else
+                    {
+                        deleteAllDirectories( child, pattern );
+                    }
+                }
+            }
+        }
+    }
+
 }

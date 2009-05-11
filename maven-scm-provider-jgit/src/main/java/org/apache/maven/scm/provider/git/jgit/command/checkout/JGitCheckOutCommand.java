@@ -19,7 +19,6 @@ package org.apache.maven.scm.provider.git.jgit.command.checkout;
  * under the License.
  */
 
-import org.apache.maven.scm.ScmBranch;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
@@ -31,8 +30,8 @@ import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.spearce.jgit.lib.ProgressMonitor;
-import org.spearce.jgit.simple.LsFileEntry;
 import org.spearce.jgit.simple.SimpleRepository;
+import org.spearce.jgit.simple.StatusEntry;
 import org.spearce.jgit.transport.URIish;
 
 import java.io.File;
@@ -102,10 +101,10 @@ public class JGitCheckOutCommand
             }
             
             List<ScmFile> listedFiles = new ArrayList<ScmFile>();
-            List<LsFileEntry> fileEntries = srep.lsFiles();
-            for (LsFileEntry entry : fileEntries)
+            List<StatusEntry> fileEntries = srep.status(true, false);
+            for (StatusEntry entry : fileEntries)
             {
-                listedFiles.add( new ScmFile(entry.getFilePath(), JGitUtils.getScmFileStatus( entry.getStatus() ) ) );
+                listedFiles.add( new ScmFile(entry.getFilePath().getPath(), JGitUtils.getScmFileStatus( entry ) ) );
             }
             
             return new CheckOutScmResult("checkout via JGit", listedFiles );

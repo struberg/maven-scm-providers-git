@@ -29,10 +29,8 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.spearce.jgit.simple.LsFileEntry;
 import org.spearce.jgit.simple.SimpleRepository;
+import org.spearce.jgit.simple.StatusEntry;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,14 +63,14 @@ public class JGitAddCommand
             
             // git-add doesn't show single files, but only summary
             // so we must run git-status
-            List<LsFileEntry> entries = srep.lsFiles();
+            List<StatusEntry> entries = srep.status();
 
             List<ScmFile> changedFiles = new ArrayList<ScmFile>();
 
             // rewrite all detected files to now have status 'checked_in'
-            for ( LsFileEntry entry : entries )
+            for ( StatusEntry entry : entries )
             {
-                ScmFile scmfile = new ScmFile( entry.getFilePath(), JGitUtils.getScmFileStatus( entry.getStatus() ) );
+                ScmFile scmfile = new ScmFile( entry.getFilePath().getPath(), JGitUtils.getScmFileStatus( entry ) );
 
                 // if a specific fileSet is given, we have to check if the file is really tracked
                 for ( Iterator<File> itfl = fileSet.getFileList().iterator(); itfl.hasNext(); )

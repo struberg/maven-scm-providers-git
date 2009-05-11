@@ -29,8 +29,8 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
-import org.spearce.jgit.simple.LsFileEntry;
 import org.spearce.jgit.simple.SimpleRepository;
+import org.spearce.jgit.simple.StatusEntry;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class JGitCheckInCommand
 
             JGitUtils.addAllFiles( srep, fileSet );
     
-            List<LsFileEntry> entries = srep.lsFiles();
+            List<StatusEntry> entries = srep.status();
             
             srep.commit( null, null, message );
             srep.push( JGitUtils.getMonitor( getLogger() ), "origin", branch );
@@ -68,9 +68,9 @@ public class JGitCheckInCommand
             List<ScmFile> checkedInFiles = new ArrayList<ScmFile>( entries.size() );
     
             // parse files to now have status 'checked_in'
-            for ( LsFileEntry entry : entries )
+            for ( StatusEntry entry : entries )
             {
-                ScmFile scmfile = new ScmFile( entry.getFilePath(), JGitUtils.getScmFileStatus( entry.getStatus() ) );
+                ScmFile scmfile = new ScmFile( entry.getFilePath().getPath(), JGitUtils.getScmFileStatus( entry ) );
     
                 if ( fileSet.getFileList().isEmpty() )
                 {
