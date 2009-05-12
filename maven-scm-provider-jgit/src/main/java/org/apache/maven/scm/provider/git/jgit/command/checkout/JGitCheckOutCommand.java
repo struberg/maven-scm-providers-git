@@ -104,7 +104,7 @@ public class JGitCheckOutCommand
             List<StatusEntry> fileEntries = srep.status(true, false);
             for (StatusEntry entry : fileEntries)
             {
-                listedFiles.add( new ScmFile(entry.getFilePath().getPath(), JGitUtils.getScmFileStatus( entry ) ) );
+                listedFiles.add( new ScmFile(entry.getFilePath(), JGitUtils.getScmFileStatus( entry ) ) );
             }
             
             return new CheckOutScmResult("checkout via JGit", listedFiles );

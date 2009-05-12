@@ -70,7 +70,7 @@ public class JGitAddCommand
             // rewrite all detected files to now have status 'checked_in'
             for ( StatusEntry entry : entries )
             {
-                ScmFile scmfile = new ScmFile( entry.getFilePath().getPath(), JGitUtils.getScmFileStatus( entry ) );
+                ScmFile scmfile = new ScmFile( entry.getFilePath(), JGitUtils.getScmFileStatus( entry ) );
 
                 // if a specific fileSet is given, we have to check if the file is really tracked
                 for ( Iterator<File> itfl = fileSet.getFileList().iterator(); itfl.hasNext(); )

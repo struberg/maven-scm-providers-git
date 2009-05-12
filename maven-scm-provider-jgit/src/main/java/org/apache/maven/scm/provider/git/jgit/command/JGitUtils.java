@@ -70,15 +70,15 @@ public class JGitUtils
         IndexStatus is = status.getIndexStatus();
         RepoStatus  rs = status.getRepoStatus();
         
-        if ( is.equals( IndexStatus.UNCHANGED ) && rs.equals( RepoStatus.UNCHANGED ) ) 
-        {
-            return ScmFileStatus.CHECKED_IN; 
-        }
-        else if ( is.equals( IndexStatus.ADDED ) && rs.equals( RepoStatus.ADDED ) ) 
+        if ( is.equals( IndexStatus.ADDED ) ) 
         {
             return ScmFileStatus.ADDED; 
         }
-        else if ( is.equals( IndexStatus.UNTRACKED ) || is.equals( IndexStatus.MODIFIED ) )
+        else if ( rs.equals( RepoStatus.UNCHANGED ) ) 
+        {
+            return ScmFileStatus.CHECKED_IN; 
+        }
+        else if ( is.equals( IndexStatus.MODIFIED ) )
         {
             return ScmFileStatus.MODIFIED;
         }

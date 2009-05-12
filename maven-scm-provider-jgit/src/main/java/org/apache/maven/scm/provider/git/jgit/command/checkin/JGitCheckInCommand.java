@@ -22,6 +22,7 @@ package org.apache.maven.scm.provider.git.jgit.command.checkin;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.checkin.AbstractCheckInCommand;
 import org.apache.maven.scm.command.checkin.CheckInScmResult;
@@ -64,29 +65,36 @@ public class JGitCheckInCommand
             
             srep.commit( null, null, message );
             srep.push( JGitUtils.getMonitor( getLogger() ), "origin", branch );
-    
+
             List<ScmFile> checkedInFiles = new ArrayList<ScmFile>( entries.size() );
     
             // parse files to now have status 'checked_in'
             for ( StatusEntry entry : entries )
             {
-                ScmFile scmfile = new ScmFile( entry.getFilePath().getPath(), JGitUtils.getScmFileStatus( entry ) );
-    
-                if ( fileSet.getFileList().isEmpty() )
+                ScmFileStatus scmStatus = JGitUtils.getScmFileStatus( entry );
+                if ( scmStatus.equals( ScmFileStatus.ADDED )  || 
+                     scmStatus.equals( ScmFileStatus.DELETED) || 
+                     scmStatus.equals( ScmFileStatus.CHECKED_IN ) ) 
                 {
-                    checkedInFiles.add( scmfile );
-                }
-                else
-                {
-                    // if a specific fileSet is given, we have to check if the file is really tracked
-                    for ( Iterator<File> itfl = fileSet.getFileList().iterator(); itfl.hasNext(); )
+                    // files which were previously added or deleted now got checked_in!
+                    ScmFile scmfile = new ScmFile( entry.getFilePath(), ScmFileStatus.CHECKED_IN );
+        
+                    if ( fileSet.getFileList().isEmpty() )
                     {
-                        File f =  itfl.next();
-                        if ( f.toString().equals( scmfile.getPath() ) )
+                        checkedInFiles.add( scmfile );
+                    }
+                    else
+                    {
+                        // if a specific fileSet is given, we have to check if the file is really tracked
+                        for ( Iterator<File> itfl = fileSet.getFileList().iterator(); itfl.hasNext(); )
                         {
-                            checkedInFiles.add( scmfile );
+                            File f =  itfl.next();
+                            if ( f.toString().equals( scmfile.getPath() ) )
+                            {
+                                checkedInFiles.add( scmfile );
+                            }
+        
                         }
-    
                     }
                 }
             }
