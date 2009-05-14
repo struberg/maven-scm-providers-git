@@ -19,27 +19,13 @@ package org.apache.maven.scm.provider.git.jgit.command.checkin;
  * under the License.
  */
 
-import org.apache.maven.scm.provider.git.GitScmTestUtils;
-import org.apache.maven.scm.tck.command.checkin.CheckInCommandTckTest;
+import org.apache.maven.scm.provider.git.command.checkin.GitCheckInCommandTckTest;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  * @version $Id: JGitCheckInCommandTckTest.java  $
  */
 public class JGitCheckInCommandTckTest
-    extends CheckInCommandTckTest
+    extends GitCheckInCommandTckTest
 {
-    /** {@inheritDoc} */
-    public String getScmUrl()
-        throws Exception
-    {
-        return GitScmTestUtils.getScmUrl( getRepositoryRoot() );
-    }
-
-    /** {@inheritDoc} */
-    public void initRepo()
-        throws Exception
-    {
-        GitScmTestUtils.initRepo( "src/test/resources/repository/", getRepositoryRoot(), getWorkingDirectory() );
-    }
 }

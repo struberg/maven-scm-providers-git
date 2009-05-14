@@ -32,6 +32,7 @@ import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.spearce.jgit.simple.SimpleRepository;
 import org.spearce.jgit.simple.StatusEntry;
+import org.spearce.jgit.simple.StatusEntry.IndexStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,9 +59,24 @@ public class JGitCheckInCommand
             SimpleRepository srep = SimpleRepository.existing( fileSet.getBasedir() );
     
             String branch = JGitUtils.getBranchName( version );
-
-            JGitUtils.addAllFiles( srep, fileSet );
-    
+            if ( !fileSet.getFileList().isEmpty() )
+            {
+                JGitUtils.addAllFiles( srep, fileSet );
+            }
+            else
+            {
+                // add all tracked files which are modified manually
+                List<StatusEntry> entries = srep.status();
+                for ( StatusEntry s : entries )
+                {
+                    if ( s.getIndexStatus().equals( IndexStatus.MODIFIED ) )
+                    {
+                        srep.add( new File( fileSet.getBasedir(), s.getFilePath() ), false );
+                    }
+                }
+            }
+            
+            // now read the status of all files which will be committed finally
             List<StatusEntry> entries = srep.status();
             
             srep.commit( null, null, message );
