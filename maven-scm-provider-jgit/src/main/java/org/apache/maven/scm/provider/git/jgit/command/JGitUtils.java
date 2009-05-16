@@ -1,10 +1,12 @@
 package org.apache.maven.scm.provider.git.jgit.command;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.scm.ScmBranch;
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmVersion;
@@ -13,7 +15,6 @@ import org.spearce.jgit.lib.ProgressMonitor;
 import org.spearce.jgit.lib.TextProgressMonitor;
 import org.spearce.jgit.simple.SimpleRepository;
 import org.spearce.jgit.simple.StatusEntry;
-import org.spearce.jgit.simple.LsFileEntry.LsFileStatus;
 import org.spearce.jgit.simple.StatusEntry.IndexStatus;
 import org.spearce.jgit.simple.StatusEntry.RepoStatus;
 
@@ -66,7 +67,8 @@ public class JGitUtils
      * @throws ScmException if the given Status cannot be translated
      */
     public static ScmFileStatus getScmFileStatus( StatusEntry status ) 
-    throws ScmException {
+    throws ScmException 
+    {
         IndexStatus is = status.getIndexStatus();
         RepoStatus  rs = status.getRepoStatus();
         
@@ -74,7 +76,7 @@ public class JGitUtils
         {
             return ScmFileStatus.ADDED; 
         }
-        else if ( rs.equals( RepoStatus.UNCHANGED ) ) 
+        else if ( is.equals( IndexStatus.UNCHANGED ) && rs.equals( RepoStatus.UNCHANGED ) ) 
         {
             return ScmFileStatus.CHECKED_IN; 
         }
@@ -126,7 +128,9 @@ public class JGitUtils
      * @param fileSet
      * @throws Exception
      */
-    public static void addAllFiles( SimpleRepository srep, ScmFileSet fileSet ) throws Exception {
+    public static void addAllFiles( SimpleRepository srep, ScmFileSet fileSet ) 
+    throws Exception 
+    {
         @SuppressWarnings("unchecked")
         List<File> addFiles = fileSet.getFileList();
         if ( addFiles != null )
@@ -142,6 +146,36 @@ public class JGitUtils
             }
 
         }
+    }
+
+
+    /**
+     * Convert from List<StatusEntry> to List<ScmFile>
+     * @param statusEntries
+     * @param addUnknown if <code>false</code>, this function will not add files with 'unknown' status to the returned list 
+     * @return list with ScmFiles ready for use in ScmResult and other maven-scm APIs
+     * @throws ScmException 
+     */
+    public static List<ScmFile> getChangedFiles( List<StatusEntry> statusEntries, boolean addUnknown ) 
+    throws ScmException 
+    {
+        if ( statusEntries == null ) 
+        {
+            return null;
+        }
+        
+        List<ScmFile> changedFiles = new ArrayList<ScmFile>();
+        
+        for ( StatusEntry statusEntry : statusEntries ) 
+        {
+            ScmFileStatus status = getScmFileStatus( statusEntry );
+            if ( addUnknown || !status.equals( ScmFileStatus.UNKNOWN ) )
+            {
+                changedFiles.add( new ScmFile( statusEntry.getFilePath(), status ) );
+            }
+            
+        }
+        return changedFiles;
     }
 
 }
