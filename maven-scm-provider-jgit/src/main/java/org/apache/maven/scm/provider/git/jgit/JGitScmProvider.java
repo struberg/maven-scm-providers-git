@@ -26,6 +26,7 @@ import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.command.info.GitInfoItem;
 import org.apache.maven.scm.provider.git.command.info.GitInfoScmResult;
 import org.apache.maven.scm.provider.git.jgit.command.add.JGitAddCommand;
+import org.apache.maven.scm.provider.git.jgit.command.changelog.JGitChangeLogCommand;
 import org.apache.maven.scm.provider.git.jgit.command.checkin.JGitCheckInCommand;
 import org.apache.maven.scm.provider.git.jgit.command.checkout.JGitCheckOutCommand;
 import org.apache.maven.scm.provider.git.jgit.command.status.JGitStatusCommand;
@@ -56,7 +57,7 @@ public class JGitScmProvider
     /** {@inheritDoc} */
     protected GitCommand getChangeLogCommand()
     {
-        return null;
+        return new JGitChangeLogCommand();
     }
 
     /** {@inheritDoc} */
