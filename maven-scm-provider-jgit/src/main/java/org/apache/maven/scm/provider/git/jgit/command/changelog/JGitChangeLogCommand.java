@@ -100,7 +100,7 @@ public class JGitChangeLogCommand
         }
         catch ( Exception e )
         {
-            throw new ScmException("JGit changelog failure!", e );
+            throw new ScmException( "JGit changelog failure!", e );
         }
     }
 }
