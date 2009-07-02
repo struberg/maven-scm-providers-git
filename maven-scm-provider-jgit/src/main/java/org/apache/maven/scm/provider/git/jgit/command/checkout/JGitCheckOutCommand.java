@@ -71,6 +71,7 @@ public class JGitCheckOutCommand
             ProgressMonitor monitor = JGitUtils.getMonitor( getLogger() );
     
             String branch = JGitUtils.getBranchName( version );
+            String tag    = JGitUtils.getTagName( version );
             
             if ( !fileSet.getBasedir().exists() || !( new File( fileSet.getBasedir(), ".git" ).exists() ) )
             {
@@ -80,10 +81,14 @@ public class JGitCheckOutCommand
                     fileSet.getBasedir().delete();
                 }
     
-                
                 // no git repo seems to exist, let's clone the original repo
                 URIish uri = new URIish(repository.getUrl());
-                srep = SimpleRepository.clone( fileSet.getBasedir(), "origin", uri, branch, monitor );
+                srep = SimpleRepository.clone( fileSet.getBasedir(), "origin", uri, branch, tag, monitor );
+                
+                //X TODO I'm not sure if this workaround is really needed if clone would work ok
+                if ( tag != null ) {
+                    srep.checkout( monitor, branch, tag );
+                }
             }
             else
             {
@@ -93,7 +98,7 @@ public class JGitCheckOutCommand
                 if ( !branch.equals( srep.getBranch() ) )
                 {
                     //X TODO have to check if this really switches the branch!
-                    srep.checkout( branch, monitor );
+                    srep.checkout( monitor, branch, null );
                 }
                 
                 URIish uri = new URIish(repository.getUrl());

@@ -9,6 +9,7 @@ import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmFileStatus;
+import org.apache.maven.scm.ScmTag;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.log.ScmLogger;
 import org.spearce.jgit.lib.ProgressMonitor;
@@ -105,13 +106,20 @@ public class JGitUtils
     }
     
     /**
-     * get the branch name from the ScmVersion
+     * Get the branch name from the ScmVersion
      * @param scmVersion
-     * @return branch name if the ScmVersion indicates a branch, <code>&quot;master&quot;</code> otherwise
+     * @return branch name if the ScmVersion indicates a branch, with taking <code>&quot;master&quot;</code>
+     *         as default branch name. For tags <code>null</code> will be returned.
      */
     public static String getBranchName( ScmVersion scmVersion )
     {
         String branchName = "master";
+        
+        // we explicitly request branches, since tags will be handled differently in git
+        if (scmVersion instanceof ScmTag) {
+            return null;
+        }
+
         if (scmVersion instanceof ScmBranch)
         {
             branchName = scmVersion.getName();
@@ -119,7 +127,22 @@ public class JGitUtils
         
         return branchName;
     }
-    
+
+    /**
+     * get the tag name from the ScmVersion
+     * @param scmVersion
+     * @return tag name if the ScmVersion indicates a tag, <code>null</code> otherwise
+     */
+    public static String getTagName( ScmVersion scmVersion )
+    {
+        // we explicitly request branches, since tags will be handled differently in git
+        if (scmVersion instanceof ScmTag) {
+            return scmVersion.getName();
+        }
+
+        return null;
+    }
+
     /**
      * Add all files of the given fileSet to the SimpleRepository.
      * This will make all relative paths be under the repositories base directory. 

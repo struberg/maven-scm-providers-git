@@ -30,6 +30,7 @@ import org.apache.maven.scm.provider.git.jgit.command.changelog.JGitChangeLogCom
 import org.apache.maven.scm.provider.git.jgit.command.checkin.JGitCheckInCommand;
 import org.apache.maven.scm.provider.git.jgit.command.checkout.JGitCheckOutCommand;
 import org.apache.maven.scm.provider.git.jgit.command.status.JGitStatusCommand;
+import org.apache.maven.scm.provider.git.jgit.command.tag.JGitTagCommand;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 
 import java.io.File;
@@ -99,7 +100,7 @@ public class JGitScmProvider
     /** {@inheritDoc} */
     protected GitCommand getTagCommand()
     {
-        return null;
+        return new JGitTagCommand();
     }
 
     /** {@inheritDoc} */
