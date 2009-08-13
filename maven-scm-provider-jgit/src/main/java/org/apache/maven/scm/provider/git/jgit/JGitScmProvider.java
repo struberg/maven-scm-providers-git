@@ -38,7 +38,7 @@ import java.io.File;
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
  * @version $Id: JGitScmProvider.java  $
- * @plexus.component role="org.apache.maven.scm.provider.ScmProvider" role-hint="git"
+ * @plexus.component role="org.apache.maven.scm.provider.ScmProvider" role-hint="jgit"
  */
 public class JGitScmProvider
     extends AbstractGitScmProvider
