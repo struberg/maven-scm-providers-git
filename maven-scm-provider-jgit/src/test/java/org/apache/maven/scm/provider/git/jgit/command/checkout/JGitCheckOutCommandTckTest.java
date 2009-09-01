@@ -20,6 +20,7 @@ package org.apache.maven.scm.provider.git.jgit.command.checkout;
  * under the License.
  */
 
+import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.provider.git.command.checkout.GitCheckOutCommandTckTest;
 
 /**
@@ -29,4 +30,10 @@ import org.apache.maven.scm.provider.git.command.checkout.GitCheckOutCommandTckT
 public class JGitCheckOutCommandTckTest
     extends GitCheckOutCommandTckTest
 {
+    /** {@inheritDoc} */
+    public String getScmUrl()
+        throws Exception
+    {
+        return GitScmTestUtils.getScmUrl( getRepositoryRoot(), "jgit" );
+    }
 }
