@@ -19,6 +19,7 @@ package org.apache.maven.scm.provider.git.jgit.command.status;
  * under the License.
  */
 
+import org.apache.maven.scm.provider.git.GitScmTestUtils;
 import org.apache.maven.scm.provider.git.command.status.GitStatusCommandTckTest;
 
 /**
@@ -28,4 +29,10 @@ import org.apache.maven.scm.provider.git.command.status.GitStatusCommandTckTest;
 public class JGitStatusCommandTckTest
     extends GitStatusCommandTckTest
 {
+        /** {@inheritDoc} */
+        public String getScmUrl()
+            throws Exception
+        {
+            return GitScmTestUtils.getScmUrl( getRepositoryRoot(), "jgit" );
+        }
 }

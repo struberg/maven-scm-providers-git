@@ -71,7 +71,7 @@ public final class GitScmTestUtils
         Assert.assertTrue( workingDirectory.mkdirs() );
     }
 
-    public static String getScmUrl( File repositoryRootFile )
+    public static String getScmUrl( File repositoryRootFile, String provider )
         throws CommandLineException
     {
         String repositoryRoot = repositoryRootFile.getAbsolutePath();
@@ -104,7 +104,7 @@ public final class GitScmTestUtils
             repositoryRoot = "/" + StringUtils.replace( repositoryRoot, "\\", "/" );
         }
 
-        return "scm:git:file://" + repositoryRoot;
+        return "scm:" + provider + ":file://" + repositoryRoot;
     }
     
     
