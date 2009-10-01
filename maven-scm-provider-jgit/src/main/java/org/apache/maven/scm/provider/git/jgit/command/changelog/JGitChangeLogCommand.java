@@ -29,8 +29,8 @@ import org.apache.maven.scm.command.changelog.ChangeLogSet;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.GitChangeSet;
 import org.apache.maven.scm.provider.git.command.GitCommand;
-import org.spearce.jgit.simple.ChangeEntry;
-import org.spearce.jgit.simple.SimpleRepository;
+import org.eclipse.jgit.simple.ChangeEntry;
+import org.eclipse.jgit.simple.SimpleRepository;
 
 import java.util.ArrayList;
 import java.util.Date;

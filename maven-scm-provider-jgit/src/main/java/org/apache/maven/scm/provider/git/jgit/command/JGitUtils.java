@@ -12,12 +12,12 @@ import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmTag;
 import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.log.ScmLogger;
-import org.spearce.jgit.lib.ProgressMonitor;
-import org.spearce.jgit.lib.TextProgressMonitor;
-import org.spearce.jgit.simple.SimpleRepository;
-import org.spearce.jgit.simple.StatusEntry;
-import org.spearce.jgit.simple.StatusEntry.IndexStatus;
-import org.spearce.jgit.simple.StatusEntry.RepoStatus;
+import org.eclipse.jgit.lib.ProgressMonitor;
+import org.eclipse.jgit.lib.TextProgressMonitor;
+import org.eclipse.jgit.simple.SimpleRepository;
+import org.eclipse.jgit.simple.StatusEntry;
+import org.eclipse.jgit.simple.StatusEntry.IndexStatus;
+import org.eclipse.jgit.simple.StatusEntry.RepoStatus;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

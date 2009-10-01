@@ -34,8 +34,8 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
 import org.codehaus.plexus.util.StringUtils;
-import org.spearce.jgit.simple.LsFileEntry;
-import org.spearce.jgit.simple.SimpleRepository;
+import org.eclipse.jgit.simple.LsFileEntry;
+import org.eclipse.jgit.simple.SimpleRepository;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>

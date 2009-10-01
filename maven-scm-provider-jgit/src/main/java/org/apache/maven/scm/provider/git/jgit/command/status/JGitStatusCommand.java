@@ -29,8 +29,8 @@ import org.apache.maven.scm.command.status.StatusScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
-import org.spearce.jgit.simple.SimpleRepository;
-import org.spearce.jgit.simple.StatusEntry;
+import org.eclipse.jgit.simple.SimpleRepository;
+import org.eclipse.jgit.simple.StatusEntry;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>

@@ -29,8 +29,8 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
-import org.spearce.jgit.simple.SimpleRepository;
-import org.spearce.jgit.simple.StatusEntry;
+import org.eclipse.jgit.simple.SimpleRepository;
+import org.eclipse.jgit.simple.StatusEntry;
 
 import java.io.File;
 import java.util.ArrayList;

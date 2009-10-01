@@ -29,10 +29,10 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.git.command.GitCommand;
 import org.apache.maven.scm.provider.git.jgit.command.JGitUtils;
 import org.apache.maven.scm.provider.git.repository.GitScmProviderRepository;
-import org.spearce.jgit.lib.ProgressMonitor;
-import org.spearce.jgit.simple.SimpleRepository;
-import org.spearce.jgit.simple.StatusEntry;
-import org.spearce.jgit.transport.URIish;
+import org.eclipse.jgit.lib.ProgressMonitor;
+import org.eclipse.jgit.simple.SimpleRepository;
+import org.eclipse.jgit.simple.StatusEntry;
+import org.eclipse.jgit.transport.URIish;
 
 import java.io.File;
 import java.util.ArrayList;
