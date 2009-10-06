@@ -117,7 +117,7 @@ public class GitBranchCommand
     {
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "push" );
 
-        cl.createArg().setValue( "origin" );
+        cl.createArg().setValue( repository.getPushUrl() );
         cl.createArg().setValue( branch );
 
         return cl;

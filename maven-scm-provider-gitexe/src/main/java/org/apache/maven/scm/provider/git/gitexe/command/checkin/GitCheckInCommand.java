@@ -180,8 +180,10 @@ public class GitCheckInCommand
     {
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( fileSet.getBasedir(), "push" );
 
-        //X TODO handle version
+        cl.createArg().setValue( repository.getPushUrl() );
 
+        //X TODO handle branch
+        
         return cl;
     }
 

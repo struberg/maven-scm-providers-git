@@ -60,8 +60,8 @@ public class GitCheckOutCommand
     {
         GitScmProviderRepository repository = (GitScmProviderRepository) repo;
 
-        if ( GitScmProviderRepository.PROTOCOL_FILE.equals( repository.getProtocol() )
-            && repository.getUrl().indexOf( fileSet.getBasedir().getPath() ) >= 0 )
+        if ( GitScmProviderRepository.PROTOCOL_FILE.equals( repository.getFetchInfo().getProtocol() )
+            && repository.getFetchInfo().getPath().indexOf( fileSet.getBasedir().getPath() ) >= 0 )
         {
             throw new ScmException( "remote repository must not be the working directory" );
         }
@@ -151,7 +151,7 @@ public class GitCheckOutCommand
     {
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory.getParentFile(), "clone" );
 
-        cl.createArg().setValue( repository.getUrl() );
+        cl.createArg().setValue( repository.getFetchUrl() );
 
         cl.createArg().setFile( workingDirectory );
 
@@ -166,7 +166,7 @@ public class GitCheckOutCommand
     {
         Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "pull" );
 
-        cl.createArg().setValue( repository.getUrl() );
+        cl.createArg().setValue( repository.getFetchUrl() );
 
         if ( version != null && StringUtils.isNotEmpty( version.getName() ) )
         {

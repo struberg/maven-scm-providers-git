@@ -59,8 +59,8 @@ public class JGitCheckOutCommand
     {
         GitScmProviderRepository repository = (GitScmProviderRepository) repo;
 
-        if ( GitScmProviderRepository.PROTOCOL_FILE.equals( repository.getProtocol() )
-            && repository.getUrl().indexOf( fileSet.getBasedir().getPath() ) >= 0 )
+        if ( GitScmProviderRepository.PROTOCOL_FILE.equals( repository.getFetchInfo().getProtocol() )
+            && repository.getFetchInfo().getPath().indexOf( fileSet.getBasedir().getPath() ) >= 0 )
         {
             throw new ScmException( "remote repository must not be the working directory" );
         }
@@ -82,7 +82,7 @@ public class JGitCheckOutCommand
                 }
     
                 // no git repo seems to exist, let's clone the original repo
-                URIish uri = new URIish(repository.getUrl());
+                URIish uri = new URIish(repository.getFetchUrl());
                 srep = SimpleRepository.clone( fileSet.getBasedir(), "origin", uri, branch, tag, monitor );
                 
                 //X TODO I'm not sure if this workaround is really needed if clone would work ok
@@ -101,7 +101,7 @@ public class JGitCheckOutCommand
                     srep.checkout( monitor, branch, null );
                 }
                 
-                URIish uri = new URIish(repository.getUrl());
+                URIish uri = new URIish(repository.getFetchUrl());
                 srep.pull( uri, branch ); 
             }
             
