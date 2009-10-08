@@ -60,6 +60,12 @@ public class GitScmProviderRepository
      * TODO implement! */
     public static final String PROTOCOL_RSYNC = "rsync";
 
+    /** 
+     * No special protocol specified. Git will either use git://
+     * or ssh:// depending on whether we work locally or over the network 
+     */
+    public static final String PROTOCOL_NONE = "";
+
     /** this may either 'git' or 'jgit' depending on the underlying implementation being used */
     private String provider;
     
@@ -211,15 +217,19 @@ public class GitScmProviderRepository
         StringBuffer urlSb = new StringBuffer( repoUrl.getProtocol() );
         boolean urlSupportsUserInformation = false;
 
-        if ( PROTOCOL_SSH.equals( repoUrl.getProtocol() ) || 
+        if ( PROTOCOL_SSH.equals( repoUrl.getProtocol() )   || 
              PROTOCOL_RSYNC.equals( repoUrl.getProtocol() ) ||  
-             PROTOCOL_GIT.equals( repoUrl.getProtocol() ) )
+             PROTOCOL_GIT.equals( repoUrl.getProtocol() )   ||
+             PROTOCOL_NONE.equals(  repoUrl.getProtocol() )   )
         {
             urlSupportsUserInformation = true;
         }
 
-        urlSb.append( "://" );
-
+        if ( repoUrl.getProtocol() != null && repoUrl.getProtocol().length() > 0 )
+        {
+            urlSb.append( "://" );
+        }
+        
         // add user information if given and allowed for the protocol
         if ( urlSupportsUserInformation )
         {
@@ -263,67 +273,6 @@ public class GitScmProviderRepository
         return urlSb.toString();
     }
 
-    
- /*X TODO remove all this old stuff
-        if ( !PROTOCOL_FILE.equals( getProtocol() ) )
-        {
-            int indexSlash = urlPath.indexOf( "/" );
-
-            String hostPort = urlPath;
-
-            if ( indexSlash > 0 )
-            {
-                hostPort = urlPath.substring( 0, indexSlash );
-            }
-
-            int indexColon = hostPort.indexOf( ":" );
-
-            if ( indexColon > 0 )
-            {
-                boolean sshGitDev = false;
-                // url = scm:git:git@github.com:22:olamy/scm-git-test-one-module.git
-                if ( hostPort.startsWith( "@" ) )
-                {
-                    setHost( hostPort.substring( 1, indexColon ) );
-                }
-                else
-                {
-                    setHost( hostPort.substring( 0, indexColon ) );
-                }
-                String port = hostPort.substring( indexColon + 1 );
-
-                if ( port.indexOf( ":" ) > 0 )
-                {
-                    port = port.substring( 0, port.indexOf( ":" ) );
-                    sshGitDev = true;
-                }
-                
-                // url = scm:git:git@github.com:olamy/scm-git-test-one-module.git -> Nan
-                try
-                {
-                    setPort( Integer.parseInt( port ) );
-                }
-                catch ( NumberFormatException e )
-                {
-                    if ( !PROTOCOL_GIT.equals( getProtocol() ) )
-                    {
-                        throw e;
-                    }
-                    sshGitDev = true;
-                }
-                if (sshGitDev)
-                {
-                    this.url = "git" + urlPath;
-                }
-            }
-            else
-            {
-                setHost( hostPort );
-            }
-
-        }
-    }
-*/
     /**
      * Parse the protocol from the given url and fill it into the given RepositoryUrl.
      * @param repoUrl
@@ -360,8 +309,9 @@ public class GitScmProviderRepository
         }
         else
         {
-            // when no protocol is specified, git assumes git:// as default protocol.
-            repoUrl.setProtocol( PROTOCOL_GIT );
+            // when no protocol is specified git will pick either ssh:// or git://
+            // depending on whether we work locally or over the network
+            repoUrl.setProtocol( PROTOCOL_NONE );
             return url;
         }
        

@@ -164,24 +164,30 @@ public class GitCheckOutCommand
     private Commandline createPullCommand( GitScmProviderRepository repository, File workingDirectory,
                                            ScmVersion version )
     {
-        Commandline cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "pull" );
-
-        cl.createArg().setValue( repository.getFetchUrl() );
+        Commandline cl;
 
         if ( version != null && StringUtils.isNotEmpty( version.getName() ) )
         {
             if ( version instanceof ScmTag )
             {
-                cl.createArg().setValue( "tag" );
+                cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "checkout" );
+
                 cl.createArg().setValue( version.getName() );
             }
             else
             {
+                cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "pull" );
+
+                cl.createArg().setValue( repository.getFetchUrl() );
+
                 cl.createArg().setValue( version.getName() + ":" + version.getName() );
             }
         }
         else
         {
+            cl = GitCommandLineUtils.getBaseGitCommandLine( workingDirectory, "pull" );
+
+            cl.createArg().setValue( repository.getFetchUrl() );
             cl.createArg().setValue( "master" );
         }
         return cl;

@@ -142,14 +142,14 @@ public class GitScmProviderRepositoryTest
         throws Exception, ScmRepositoryException
     {
         testUrl( "scm:git:git@github.com:olamy/scm-git-test-one-module.git",
-                 null, "git://git@github.com:olamy/scm-git-test-one-module.git", null, "git" , null, "github.com", 0 );
+                 null, "git@github.com:olamy/scm-git-test-one-module.git", null, "git" , null, "github.com", 0 );
     }
 
     public void testGitDevURLWIthPort()
         throws Exception, ScmRepositoryException
     {
         testUrl( "scm:git:git@github.com:222:olamy/scm-git-test-one-module.git",
-                 null, "git://git@github.com:222:olamy/scm-git-test-one-module.git", null, "git", null, "github.com", 222 );
+                 null, "git@github.com:222:olamy/scm-git-test-one-module.git", null, "git", null, "github.com", 222 );
     }     
 
     
