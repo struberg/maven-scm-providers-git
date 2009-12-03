@@ -43,7 +43,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
- * @version $Id: GitTagCommand.java 754778 2009-03-15 22:26:37Z olamy $
+ * @version $Id: GitTagCommand.java 823147 2009-10-08 12:39:23Z struberg $
  */
 public class GitTagCommand
     extends AbstractTagCommand

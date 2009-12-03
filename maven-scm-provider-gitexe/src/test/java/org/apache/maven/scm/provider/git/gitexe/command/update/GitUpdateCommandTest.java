@@ -30,7 +30,7 @@ import java.io.File;
 
 /**
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
- * @version $Id: GitUpdateCommandTest.java 755751 2009-03-18 21:52:02Z olamy $
+ * @version $Id: GitUpdateCommandTest.java 823147 2009-10-08 12:39:23Z struberg $
  */
 public class GitUpdateCommandTest
     extends ScmTestCase

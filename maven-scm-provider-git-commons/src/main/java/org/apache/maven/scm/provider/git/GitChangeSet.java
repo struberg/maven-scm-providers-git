@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: GitChangeSet.java 687472 2008-08-20 21:33:40Z olamy $
+ * @version $Id: GitChangeSet.java 823147 2009-10-08 12:39:23Z struberg $
  */
 public class GitChangeSet
     extends ChangeSet

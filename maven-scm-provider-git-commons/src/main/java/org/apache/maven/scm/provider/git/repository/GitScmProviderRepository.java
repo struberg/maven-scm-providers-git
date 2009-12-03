@@ -26,7 +26,7 @@ import org.apache.maven.scm.provider.ScmProviderRepositoryWithHost;
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:struberg@apache.org">Mark Struberg</a>
- * @version $Id: GitScmProviderRepository.java 712872 2008-11-10 23:25:31Z olamy $
+ * @version $Id: GitScmProviderRepository.java 831139 2009-10-29 22:51:57Z olamy $
  */
 public class GitScmProviderRepository
     extends ScmProviderRepositoryWithHost
@@ -362,8 +362,8 @@ public class GitScmProviderRepository
     private String parseHostAndPort( RepositoryUrl repoUrl, String url ) 
         throws ScmException
     {
-        StringBuilder host = new StringBuilder();
-        StringBuilder port = new StringBuilder();
+        StringBuffer host = new StringBuffer();
+        StringBuffer port = new StringBuffer();
         
         int i = 0;
         boolean isPort = false;

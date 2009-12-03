@@ -33,7 +33,7 @@ import java.io.IOException;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GitScmTestUtils.java 691192 2008-09-02 10:48:32Z vsiveton $
+ * @version $Id: GitScmTestUtils.java 823147 2009-10-08 12:39:23Z struberg $
  */
 public final class GitScmTestUtils
 {
