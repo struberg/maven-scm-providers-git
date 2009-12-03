@@ -55,8 +55,8 @@
     
     <dependency>
         <groupId>org.eclipse.jgit</groupId>
-        <artifactId>jgit-core</artifactId>
-        <version>0.5.0-SNAPSHOT</version>
+        <artifactId>jgit-simple</artifactId>
+        <version>0.6.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
