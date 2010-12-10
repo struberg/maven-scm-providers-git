@@ -51,7 +51,7 @@ public class GitCommandLineUtils
             File f = (File) i.next();
             String relativeFile = f.getPath();
 
-            if ( f.getAbsolutePath().startsWith( cl.getWorkingDirectory().getAbsolutePath() ) )
+            if ( relativeFile.startsWith( cl.getWorkingDirectory().getAbsolutePath() ) )
             {
                 // so we can omit the starting characters
                 relativeFile = relativeFile.substring( cl.getWorkingDirectory().getAbsolutePath().length() );
